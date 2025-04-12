@@ -1,0 +1,44 @@
+% theme settings
+\usefonttheme{professionalfonts}
+% \usefonttheme{serif}
+% \usetheme{Boadilla}
+% \usecolortheme{orchid}
+\useinnertheme[shadow=false, shaded=false, titlepage=false]{tcolorbox}
+\tcbsetforeverylayer{
+    borderline={0.5pt}{0pt}{black}
+}
+\setbeamercolor{titlelike}{fg=NavyBlue}
+\setbeamercolor{frametitle}{fg=NavyBlue, bg=gray!10}
+\setbeamerfont{frametitle}{series=\bfseries}
+
+\setbeamercolor{block title}{bg=NavyBlue, fg=white}
+\setbeamercolor{block body}{bg=gray!10, fg=black}
+\setbeamerfont{block title}{size=\normalsize}
+
+
+\setbeamercolor{block title example}{bg=green!50!black, fg=white}
+% \setbeamercolor{footlinecolor}{fg=black,bg=lightgray}
+\setbeamertemplate{navigation symbols}{}
+
+% footline
+\setbeamertemplate{footline}{
+    \leavevmode
+    \hbox{%
+        \begin{beamercolorbox}[wd=0.25\paperwidth,ht=3ex,dp=1.5ex,leftskip=2ex,rightskip=2ex]{author in head/foot}%
+            \usebeamerfont{title in head/foot}%
+            \insertshortauthor \hfill
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=0.75\paperwidth,ht=3ex,dp=1.5ex,leftskip=2ex,rightskip=2ex]{page footer}%
+            \insertshorttitle \hfill
+            \insertsection \hfill
+            \insertframenumber{} / \inserttotalframenumber
+        \end{beamercolorbox}%
+    }%hbox
+}
+\setbeamercolor{page footer}{bg=gray!10, fg=black}
+\setbeamercolor{author in head/foot}{bg=gray!10, fg=black}
+
+% items
+\setbeamertemplate{enumerate item}{\color{black}\arabic{enumi}.}
+\setbeamertemplate{itemize item}{\color{black}$\circ$}
+\setbeamertemplate{itemize subitem}{\color{black}$\bullet$}

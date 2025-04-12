@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+    \node[draw, align=center] (f) { Unknown target function\\$f : X \to Y$ };
+    \node[draw,right=of f, align=center] (d) { Training examples\\$(x_1, y_1),...,(x_N, y_N)$ };
+    \node[draw, align=center,below=of f, yshift=-1cm] (h) { Hypothesis space $\mathcal{H}$ };
+    \node[draw,right=of h, align=center] (a) { Algorithm $\mathcal{A}$ };
+    \node[draw,right=of a, align=center] (g) { Final hypothesis $g \approx f$ };
+
+    \node[draw,above=of g, xshift=-1.85cm, yshift=-2.5mm] (e) { Error measure };
+    \node[above=of f, yshift=-10mm] { \color{blue} \textbf{Task} };
+    \node[above=of d, yshift=-10mm] { \color{blue!40!green} \textbf{Experience} };
+    \node[above=of e, yshift=-10mm] { \color{red!40!orange} \textbf{Performance} };
+
+    % dumb anchors
+    \node[right=of a.north,xshift=-6mm, yshift=-1mm] (aa){};
+    \node[left=of g.north,xshift=5mm, yshift=-1mm] (gg){};
+    
+    \draw[-Stealth] (f) -- (d);
+    \draw[Stealth-] (a) -- (a |- d.south);
+    \draw[-Stealth] (h) -- (a);
+    \draw[-Stealth] (a) -- (g);
+    \draw[-Stealth] (e.west) -| (aa);
+    \draw[-Stealth] (e.east) -| (gg);
+\end{tikzpicture}

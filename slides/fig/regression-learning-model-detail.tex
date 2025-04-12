@@ -1,0 +1,11 @@
+\begin{tikzpicture}
+    \node[draw,text width=3.2cm,align=center,below=of f, yshift=-1cm] (h) { Hypothesis space $\mathcal{H}$ };
+    \node[draw,right=of h,text width=2.4cm,align=center] (a) { Algorithm $\mathcal{A}$ };
+
+    \node[below=of a,xshift=-2cm, yshift=0.8cm] (l) { \textbf{Learning model} };
+    \begin{pgfonlayer}{background}
+    \node[fit={(h) (a) (l)}, rounded corners=1mm, draw, dashed, inner sep=2mm, fill=gray!10!white] (m) { };
+    \end{pgfonlayer}{background}
+
+    \draw[-Stealth] (h) -- (a);
+\end{tikzpicture}

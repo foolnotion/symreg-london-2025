@@ -1,0 +1,315 @@
+\documentclass[lualatex,professionalfonts,aspectratio=169,usepdftitle=false,xcolor={dvipsnames}]{beamer}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{fontspec}
+\usepackage{unicode-math}
+
+\usepackage[LSBC4]{fontenc}
+% \usepackage[defaultsans]{lato}
+% \setmainfont{Lato}[Scale=0.92]
+% \setsansfont{Lato}[Scale=0.92]
+% \usepackage{lete-sans-math}
+\setmainfont{Tex Gyre Heros}[Scale=0.82]
+\setsansfont{Tex Gyre Heros}[Scale=0.82]
+% \setmathfont{Lete Sans Math}[Scale=0.92]
+\setmathfont{Stix Two Math}[Scale=0.92]
+\setmonofont{Source Code Pro}[Scale=0.82]
+% \setmonofont{DejaVu Sans Mono}[Scale=0.82]
+% \setmonofont{FreeSerif}
+\newfontfamily\chessfont{FreeSerif}
+\newfontfamily\fancyfont{Tex Gyre Pagella}[Scale=0.88]
+
+\usepackage{subcaption}
+\usepackage{chronology}
+\usepackage{booktabs}
+\usepackage{cleveref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=MidnightBlue,
+    urlcolor=MidnightBlue,
+    citecolor=MidnightBlue
+}
+\usepackage{collcell}
+% \usepackage{enumitem}
+
+\usepackage{minted}
+\setminted{fontsize=\small, baselinestretch=0.9, autogobble=true}
+% \usemintedstyle{tango}
+
+\usepackage{luacolor}
+\usepackage{piton}
+\PitonOptions{
+    auto-gobble,
+    begin-escape=!,
+    end-escape=!
+}
+\usepackage{soul}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, overlay-beamer-styles, decorations.markings, shapes.geometric, decorations.pathreplacing, angles, quotes}
+\usetikzlibrary{patterns}
+\usetikzlibrary{decorations.pathreplacing,arrows,shapes,patterns,positioning,shadows,calc}
+\usetikzlibrary{decorations, decorations.text,backgrounds,arrows.meta}
+\tikzset{>=latex}
+
+\usepackage{forest}
+\usepackage[skins]{tcolorbox}
+\usepackage{tabularray}
+\usepackage[export]{adjustbox}
+\usepackage{xskak}
+\usesymfig
+\setchessfontfamily{berlin}
+\setboardfontcolors{blackfieldmask=gray!15}
+
+\usepackage[framemethod=tikz]{mdframed}
+
+\title{Zobrist Hash-Based Duplicate Detection in Symbolic Regression}
+% \subtitle{OPY1IL (AIS.ba VZ WS24)}
+\author[Bogdan Burlacu]{Bogdan Burlacu,  University of Applied Sciences Upper Austria\\ \small bogdan.burlacu@fh-ooe.at}
+\institute[FH OÖ]{\normalsize University of Applied Sciences Upper Austria}
+% \date{\today}
+\date{}
+
+\input{beamer_theme.tex}
+
+\begin{document}
+
+\newcommand{\A}[1]{{\color{NavyBlue}{#1}}}
+\newcommand{\AB}[1]{{\color{NavyBlue}\textbf{#1}}}
+\newcommand{\B}[1]{{\large \color{NavyBlue}{#1}}}
+\newcommand{\BB}[1]{{\large \color{NavyBlue}{\textbf{#1}}}}
+\newcommand{\W}[1]{{\color{NavyBlue}{#1}}}
+\newcommand{\WB}[1]{\color{NavyBlue}{\textbf{#1}}}
+\newcommand{\T}[1]{\texttt{#1}}
+\newcommand{\pp}[1]{\piton{#1}}
+\newcommand{\pps}[1]{{\small \piton{#1}}}
+
+% chess pieces :)
+\newcommand{\whitepawn}{{\chessfont \char"2659}}
+\newcommand{\whiteknight}{{\chessfont \char"2658}}
+\newcommand{\whitebishop}{{\chessfont \char"2657}}
+\newcommand{\whiterook}{{\chessfont \char"2656}}
+\newcommand{\whitequeen}{{\chessfont \char"2655}}
+\newcommand{\whiteking}{{\chessfont \char"2654}}
+\newcommand{\blackpawn}{{\chessfont \char"265F}}
+\newcommand{\blackknight}{{\chessfont \char"265E}}
+\newcommand{\blackbishop}{{\chessfont \char"265D}}
+\newcommand{\blackrook}{{\chessfont \char"265C}}
+\newcommand{\blackqueen}{{\chessfont \char"265B}}
+\newcommand{\blackking}{{\chessfont \char"265A}}
+\newcolumntype{P}{>{\collectcell\pps}l<{\endcollectcell}}
+
+{
+    \setbeamertemplate{headline}{}
+    \setbeamertemplate{footline}{}
+    \usebackgroundtemplate{\includegraphics[width=1.0\paperwidth]{background.png}}
+    \begin{frame}[plain]
+        \begin{mdframed}[tikzsetting={draw=none,fill=white,fill opacity=0.9,
+            line width=0pt, align=center},backgroundcolor=none,leftmargin=0,
+            rightmargin=0,innertopmargin=4pt]
+            {\huge \bfseries \fancyfont Symbolic Regression in the Physical Sciences}\\
+            \vspace{2em}
+
+            {\Large \bfseries \color{NavyBlue} \inserttitle}\\
+            {\insertauthor}
+        \end{mdframed}
+    \end{frame}
+}
+
+\begin{frame}
+    \frametitle{About Me}
+
+    \B{Professor of Data Science and Machine Learning}\\
+    Heuristic and Evolutionary Algorithms Laboratory\\
+    University of Applied Sciences Upper Austria
+    \bigskip
+
+    \B{Research Interests}
+    \begin{itemize}
+        \item symbolic regression, physical modeling, simulation and optimization
+        \item explainability and interpretable machine learning
+        \item algorithm design, scalability, energy-efficient AI
+        \item author of the Operon library\\
+        \url{https://github.com/heal-research/operon}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing}
+
+    \B{Technique used in abstract board games to implement transposition tables.}
+
+    \begin{itemize}
+        \item Starts by randomly generating bitstrings for each possible element of a board game\\(i.e. for each combination of a piece and a position)
+        \item The Zobrist hash is computed by combining those bitstrings using bitwise XOR
+        \item If the bitstrings are long enough, the probability of collisions is negligible
+    \end{itemize}
+    \bigskip{}
+
+    \B{Bitwise XOR $\to$ incremental hash update}
+    \begin{align*}
+        a \oplus b &= b \oplus a & & \text{(associativity)}\\
+        a \oplus (b \oplus c) &= (a \oplus b) \oplus c & & \text{(commutativity)}\\
+        a \oplus b \oplus b &= a & & \text{(involution)}
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing}
+
+    \begin{columns}[t]
+        % \column{0.5\textwidth}
+
+        % \chessboard[boardfontencoding=LSBC4,setfontcolors,
+        %     fontsize=12pt,boardfontsize=22,
+        %     labelfontsize=10pt,labelfont=\ttfamily,
+        %     maxfield=d4,showmover=false,
+        %     addpieces={Kc1,Nc3,Rd1,Pa2,Pb2,Pc2},
+        %     pgfstyle={[base,at={\pgfpoint{0ex}{-0.25ex}}]text},opacity=1.0,color=black,
+        % ]
+
+        \column{0.5\textwidth}
+        \chessboard[boardfontencoding=LSBC4,setfontcolors,
+            setfen={8/8/4kpp1/3p4/p6P/2B4b/6P1/6K1},showmover=true,
+            fontsize=12pt,boardfontsize=15]
+
+        \column{0.5\textwidth}
+        \begin{table}
+            \footnotesize
+            \begin{tblr}{colspec={c|ccccc}, column{1}={font=\chessfont\Large}, row{8}={font=\bfseries}, rowsep=1.2pt}
+                \whitepawn & 2173 & 1288 & 1235 & 2880 & 3217\\
+                \blackpawn & 1074 & 1570 & 3800 & 1538 & 1260\\
+                \whiteknight & 3658 & 1022 & 1433 & 1801 & 2504\\
+                \blackknight & 4054 & 3302 & 2029 & 1632 & 2549\\
+                {\footnotesize $\vdots$} & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$\\
+                \whiteking & 1909 & 3847 & 3117 & 2965 & 2533\\
+                \blackking & 1270 & 1694 & 1986 & 3800 & 4014\\
+                \hline
+                & 0 & 1 & 2 & \dots & 63\\
+                & $a_1$ & $b_1$ & $c_1$ & \dots & $h_8$\\
+            \end{tblr}
+        \end{table}
+    \end{columns}
+    \bigskip
+
+    \[
+        \mathcal{H}(\text{position}) = h_{\text{\whiteking}g_1} \oplus h_{\text{\whitepawn}g_2} \oplus h_{\text{\whitebishop}c_3} \oplus h_{\text{\blackbishop}h_3} \oplus h_{\text{\whitepawn}h_4} \oplus h_{\text{\blackpawn}a_4} \oplus h_{\text{\blackpawn}d_5} \oplus h_{\text{\blackking}e_6} \oplus h_{\text{\blackpawn}f_6} \oplus h_{\text{\blackpawn}g_6}
+    \]
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing}
+
+    \begin{table}
+        \centering
+        \begin{tblr}{colspec={c|c}, rows={f}}
+            \adjustbox{valign=c}{\rotatebox{90}{\hspace{0.7cm}symbol $s \in \mathcal{S}$}} & {Randomly generated\\ hash values $h_{s,i}$}\\
+            \hline
+            & position $i$\\
+        \end{tblr}
+    \end{table}
+
+    \[
+        \mathcal{H}(\text{state}) = \bigoplus h_{s, i}
+    \]
+
+    If the \A{state} of a program$^1$ can be described by a list of symbols and their associated positions, then it can be efficiently maintained using Zobrist hashing.
+    \bigskip
+
+    \footnotesize
+    $^{1}\text{algorithm, search method, simulation, optimization procedure}$
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=1\textwidth]{./fig/zobrist_monte_carlo.png}
+    \end{figure}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Zobrist Hashing}
+    \begin{columns}[t]
+
+    \column{0.5\textwidth}
+    Expression tree $T$
+    \begin{figure}
+        \begin{forest}
+            [$^{\color{red} 0}\times$ [$^{\color{red} 1}+$ [$^{\color{red}2}x_1$] [$^{\color{red}3}x_2$]] [$^{\color{red}4}-$ [$^{\color{red}5}x_3$] [$^{\color{red}6}x_4$]]]
+        \end{forest}\\
+        $f(\mathbf{x}) = (x_1 + x_2) \times (x_3 - x_4)$
+    \end{figure}
+
+    Prefix representation:
+    \begin{table}
+        \begin{tblr}{colspec={ccccccc}, colsep=1.5pt, row{2}={font=\color{red}\scriptsize}, rowsep=0pt}
+            $\times$ & $+$ & $x_1$ & $x_2$ & $-$ & $x_3$ & $x_4$\\
+            0 & 1 & 2 & 3 & 4 & 5 & 6\\
+        \end{tblr}
+    \end{table}
+
+    \column{0.5\textwidth}
+    \begin{table}
+        \footnotesize
+        \begin{tblr}{colspec={c|c}, rowsep=1.2pt}
+            $+$ & \SetCell[r=9]{c} {Filled with\\ random values}\\
+            $-$ & \\
+            $\times$ & \\
+            $\div$ & \\
+            $\vdots$ & \\
+            $x_1$ & \\
+            $x_2$ & \\
+            $x_3$ & \\
+            $x_4$ & \\
+            $c$   & \\
+            \hline
+                & position $i = 0,\dots,N$\\
+        \end{tblr}
+    \end{table}
+    \end{columns}
+
+    \centering
+    $\mathcal{H}(T) = h_{\times,0} \oplus h_{+, 1} \oplus h_{x_1, 2} \oplus h_{x_2, 3} \oplus h_{-,4} \oplus h_{x_3, 5} \oplus h_{x_4, 6}$
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
+
+    \begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.42\textwidth}
+            % \caption{Parent $T_1$}
+            Parent tree $T_1$\\
+            \begin{forest}
+                [$^{\color{red} 0}\times$ [$^{\color{red} 1}+$ [$^{\color{red}2}x_1$] [$^{\color{red}3}x_2$]] [$^{\color{red}4}-$, color=Green [$^{\color{red}5}x_3$, color=Green, edge=Green] [$^{\color{red}6}x_4$, color=Green, edge=Green]]]
+            \end{forest}\\
+            $f_1(\mathbf{x}) = (x_1 + x_2) \times (x_3 - x_4)$
+        \end{subfigure}
+        \begin{subfigure}[b]{0.29\textwidth}
+            Parent tree $T_2$\\
+            \begin{forest}
+                [$^{\color{red} 0}\div$ [$^{\color{red} 1}\times$ [$^{\color{red}2}x_1$] [$^{\color{red}3}x_2$]] [$^{\color{red}4}\centerdot^2$, color=NavyBlue [$^{\color{red}5}x_3$, color=NavyBlue, edge=NavyBlue]]]
+            \end{forest}\\
+            $f_2(\mathbf{x}) = {x_1 x_2}/{x_3^2}$
+        \end{subfigure}
+        \begin{subfigure}[b]{0.25\textwidth}
+            Child tree $C_1$\\
+            \begin{forest}
+                [$^{\color{red} 0}\times$ [$^{\color{red} 1}+$ [$^{\color{red}2}x_1$] [$^{\color{red}3}x_2$]] [$^{\color{red}4}\centerdot^2$, color=NavyBlue [$^{\color{red}5}x_3$, color=NavyBlue, edge=NavyBlue]]]
+            \end{forest}\\
+            $f_3(\mathbf{x}) = (x_1 + x_2){x_3^2}$
+        \end{subfigure}
+    \end{figure}
+    \bigskip
+
+    \A{Incremental hash update after crossover}
+    \[
+        \mathcal{H}(C_1) = \mathcal{H}(T_1) \oplus {\color{Green}\underbrace{h_{-,4} \oplus h_{x_3,5} \oplus h_{x_4, 6}}_{\text{XOR ``out'' $(x_3 - x_4)$}}} \oplus {\color{NavyBlue} \underbrace{h_{\centerdot^2,4} \oplus  h_{x_3, 5}}_{\text{XOR ``in'' $x_3^2$}}}
+    \]
+\end{frame}
+
+\end{document}
