@@ -1,7 +1,6 @@
 \documentclass[lualatex,professionalfonts,aspectratio=169,usepdftitle=false,xcolor={dvipsnames}]{beamer}
 
 \usepackage[utf8]{inputenc}
-
 \usepackage{fontspec}
 \usepackage{unicode-math}
 
@@ -18,7 +17,10 @@
 % \setmonofont{DejaVu Sans Mono}[Scale=0.82]
 % \setmonofont{FreeSerif}
 \newfontfamily\chessfont{FreeSerif}
+% \newfontfamily\fancyfont{Stix Two Text}[Scale=0.88]
 \newfontfamily\fancyfont{Tex Gyre Pagella}[Scale=0.88]
+
+\usepackage{amssymb}
 
 \usepackage{subcaption}
 \usepackage{chronology}
@@ -73,6 +75,8 @@
 
 \input{beamer_theme.tex}
 
+\DeclareRobustCommand{\hlcyan}[1]{{\sethlcolor{cyan}\hl{#1}}}
+
 \begin{document}
 
 \newcommand{\A}[1]{{\color{NavyBlue}{#1}}}
@@ -121,8 +125,8 @@
     \frametitle{About Me}
 
     \B{Professor of Data Science and Machine Learning}\\
-    Heuristic and Evolutionary Algorithms Laboratory\\
-    University of Applied Sciences Upper Austria
+    University of Applied Sciences Upper Austria\\
+    Heuristic and Evolutionary Algorithms Laboratory
     \bigskip
 
     \B{Research Interests}
@@ -130,11 +134,13 @@
         \item symbolic regression, physical modeling, simulation and optimization
         \item explainability and interpretable machine learning
         \item algorithm design, scalability, energy-efficient AI
+        \item chess engine programming
         \item author of the Operon library\\
         \url{https://github.com/heal-research/operon}
     \end{itemize}
 \end{frame}
 
+\section{Zobrist Hashing}
 \begin{frame}
     \frametitle{Zobrist Hashing}
 
@@ -158,23 +164,41 @@
 \begin{frame}
     \frametitle{Zobrist Hashing}
 
+    \AB{Example}
+
+    The word ``cat'' contains three symbols: \A{c}, \A{a}, \A{t}. We associate some random values to each letter:
+    \begin{table}
+        \centering
+        \begin{tblr}{colspec={ll}, stretch=0}
+            a & 485\\
+            c & 688\\
+            t & 118\\
+        \end{tblr}
+    \end{table}
+
+    \begin{itemize}
+        \item $\mathcal{H}(\text{``cat''}) = 688 \oplus 485 \oplus 118 = 803$
+        \item hashing lowercase words up to length $m$ from an alphabet of size $n$ will require a $n \times m$ Zobrist table (filled with random values)
+        \item \A{for a board game}: $n$ squares $\times$ $m$ piece types \begin{itemize}
+            \item Chess: $n=64, m=12$
+            \item Go: $n=361, m=2$
+            \item \A{Symbolic regression}: (number of symbols) $\times$ (max expression size)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing}
+
     \begin{columns}[t]
-        % \column{0.5\textwidth}
-
-        % \chessboard[boardfontencoding=LSBC4,setfontcolors,
-        %     fontsize=12pt,boardfontsize=22,
-        %     labelfontsize=10pt,labelfont=\ttfamily,
-        %     maxfield=d4,showmover=false,
-        %     addpieces={Kc1,Nc3,Rd1,Pa2,Pb2,Pc2},
-        %     pgfstyle={[base,at={\pgfpoint{0ex}{-0.25ex}}]text},opacity=1.0,color=black,
-        % ]
-
         \column{0.5\textwidth}
+
         \chessboard[boardfontencoding=LSBC4,setfontcolors,
             setfen={8/8/4kpp1/3p4/p6P/2B4b/6P1/6K1},showmover=true,
             fontsize=12pt,boardfontsize=15]
 
         \column{0.5\textwidth}
+
         \begin{table}
             \footnotesize
             \begin{tblr}{colspec={c|ccccc}, column{1}={font=\chessfont\Large}, row{8}={font=\bfseries}, rowsep=1.2pt}
@@ -232,7 +256,7 @@
 
 
 \begin{frame}
-    \frametitle{Zobrist Hashing}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
     \begin{columns}[t]
 
     \column{0.5\textwidth}
@@ -253,6 +277,7 @@
     \end{table}
 
     \column{0.5\textwidth}
+    Zobrist table:
     \begin{table}
         \footnotesize
         \begin{tblr}{colspec={c|c}, rowsep=1.2pt}
@@ -312,4 +337,474 @@
     \]
 \end{frame}
 
+\begin{frame}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
+
+    \B{The Zobrist hash provides a means to cache duplicate structures that may occur}
+    \begin{itemize}
+        \item We could cache solution candidates and their fitness
+        \item We could use this information to guide the search
+    \end{itemize}
+    \bigskip
+
+    \BB{Why do duplicates occur in the first place?}
+    \begin{itemize}
+        \item The search process is driven by ``natural selection''
+        \item Selection probability proportional with fitness (i.e., training error)
+        \item Fit solution candidates will propagate (``survival of the fittest'')
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
+
+    \begin{figure}
+        \tcbset{enhanced, width=0.9\textwidth, nobeforeafter, rounded corners, arc=1mm, colbacktitle=NavyBlue, coltitle=white, fonttitle=\bfseries, colback=gray!10!white}
+
+        \begin{tcolorbox}[title=Initialization, remember as=N1]
+            \begin{enumerate}
+                \item Generate $N$ random trees
+                \item Evaluate their fitness on the training data
+            \end{enumerate}
+        \end{tcolorbox}
+        \vspace{2em}
+
+        \begin{tcolorbox}[title=Main loop, remember as=N2]
+            \begin{enumerate}
+                \item \textbf{Selection}: choose $N$ parent pairs for recombination
+                \item \textbf{Recombination}: produce $N$ children via crossover/mutation
+                \item \textbf{Fitness evaluation}: compute fitness for child individuals
+                \item \textbf{Replacement}: child individuals replace parents
+                \item \textbf{Check stop}: if not converged, go to step 1, otherwise stop.
+            \end{enumerate}
+        \end{tcolorbox}
+        \tikz[overlay, remember picture] \draw[-stealth, line width=3pt, color=gray] (N1)--(N2);
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
+
+    \begin{figure}
+        \tcbset{enhanced, width=0.9\textwidth, nobeforeafter, rounded corners, arc=1mm, colbacktitle=NavyBlue, coltitle=white, fonttitle=\bfseries, colback=gray!10!white}
+
+        \begin{tcolorbox}[title=Initialization, remember as=N1]
+            \begin{enumerate}
+                \item Generate $N$ random trees
+                \item Evaluate their fitness on the training data
+            \end{enumerate}
+        \end{tcolorbox}
+        \vspace{2em}
+
+        \begin{tcolorbox}[title=Main loop, remember as=N2]
+            \begin{enumerate}
+                \item \textbf{Selection}: choose $N$ parent pairs for recombination
+                \item \textbf{Recombination}: produce $N$ children via crossover/mutation $\implies$ \hlcyan{promote novelty}
+                \item \textbf{Fitness evaluation}: compute fitness for child individuals $\implies$\hlcyan{cache fitness}
+                \item \textbf{Replacement}: child individuals replace parents
+                \item \textbf{Check stop}: if not converged, go to step 1, otherwise stop.
+            \end{enumerate}
+        \end{tcolorbox}
+        \tikz[overlay, remember picture] \draw[-stealth, line width=3pt, color=gray] (N1)--(N2);
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
+
+    \BB{Novelty promotion}
+
+    If a child individual's Zobrist signature is already in the cache, discard it and produce a new one
+    \A{Crossover}: \begin{itemize}
+        \item check all possible subtree exchanges between two parent trees $T_1$ and $T_2$
+        \item discard exchanges which would lead to an already-seen hash
+    \end{itemize}
+    \smallskip
+
+    \A{Mutation}:
+    \begin{itemize}
+        \item for a parent tree $T_1$, perform a random change and update hash, discard already-seen hashes
+    \end{itemize}
+    \bigskip
+
+    \BB{Fitness cache}
+
+    If child Zobrist hash already in the cache, return stored fitness (do not re-evaluate)
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
+
+    \BB{Implementation (Operon C++)}
+    \begin{itemize}
+        \item Global Zobrist table (singleton class) initialized at program start
+        \item Parallel hash table mapping Zobrist signature to fitness values
+    \end{itemize}
+    \bigskip
+
+    \begin{table}
+        \footnotesize
+        \begin{tblr}{colspec={c|c}, rowsep=1.2pt}
+            $+$ & \SetCell[r=9]{c} {Filled with\\ random values}\\
+            $-$ & \\
+            $\times$ & \\
+            $\div$ & \\
+            $\vdots$ & \\
+            $x_1$ & \\
+            $x_2$ & \\
+            $x_3$ & \\
+            $x_4$ & \\
+            $c$   & \\
+            \hline
+                & position $i = 0,\dots,N$\\
+        \end{tblr}
+    \end{table}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zobrist Hashing in Symbolic Regression}
+
+    \BB{Implementation (Operon C++)}
+    \begin{itemize}
+        \item Global Zobrist table (singleton class) initialized at program start
+        \item Parallel hash table mapping Zobrist signature to fitness values
+    \end{itemize}
+    \bigskip
+
+    \A{Model coefficients not included in hash signature $\to$ must be optimized beforehand}
+
+    \begin{forest}
+        [$+$ [${\color{NavyBlue} \theta_1} x_1$] [${\color{NavyBlue} \theta_2}$]]
+    \end{forest}
+    \bigskip
+
+    \A{Coefficient optimization}:
+    \begin{itemize}
+        \item Nonlinear least squares (Levenberg-Marquardt)
+        \item Configurable number of gradient descent iterations
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Test problems}
+
+    \begin{table}
+        \begin{tblr}{colspec={lrrrr}}
+            \AB{Problem} & \AB{Points} & \AB{Features} & \AB{Train} & \AB{Test}\\
+            Chemical-I & 4999 & 25 & 3136 & 1863\\
+            Chemical-II & 1066 & 57 & 711 & 355\\
+            FrictionDyn-OneHot & 2016 & 17 & 1010 & 1016\\
+            FrictionStat-OneHot & 2016 & 16 & 1010 & 1016\\
+            Flow Stress & 7800 & 2 & 4200 & 3600\\
+            Nasa Battery 1\_10 & 636 & 6 & 504 & 132\\
+            Nasa Battery 2\_10 & 1638 & 5 & 1101 & 537\\
+            Nikuradse 1 & 362 & 2 & 230 & 132\\
+            Nikuradse 2 & 362 & 1 & 230 & 132\\
+        \end{tblr}
+    \end{table}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Experimental Setup}
+
+    \AB{NSGA-II Algorithm}
+    \begin{itemize}
+        \item 50 independent runs for each problem
+        \item 1000 individuals, 300 generations
+        \item varying number of LM-iterations (1, 10, 50, 100)
+        \item transposition cache=on/off, transposition-operators=on/off
+        \item executed on 16 threads (Ryzen 5950X)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results -- Runtime}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\textwidth]{./fig/runtime.pdf}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results -- Energy Cost}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\textwidth]{./fig/energy.pdf}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Chemical-I_test_performance.pdf}
+        \caption{Chemical-I Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Chemical-I_expression_size.pdf}
+        \caption{Chemical-I Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Chemical-II_test_performance.pdf}
+        \caption{Chemical-II Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Chemical-II_expression_size.pdf}
+        \caption{Chemical-II Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Flow-stress_test_performance.pdf}
+        \caption{Flow Stress Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Flow-stress_expression_size.pdf}
+        \caption{Flow Stress Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/FrictionDyn-OneHot_test_performance.pdf}
+        \caption{FrictionDyn-OneHot Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/FrictionDyn-OneHot_expression_size.pdf}
+        \caption{FrictionDyn-OneHot Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/FrictionDyn-OneHot_test_performance.pdf}
+        \caption{FrictionStat-OneHot Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/FrictionDyn-OneHot_expression_size.pdf}
+        \caption{FrictionStat-OneHot Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nasa Battery 1_10_test_performance.pdf}
+        \caption{Nasa Battery 1\_10 Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nasa Battery 1_10_expression_size.pdf}
+        \caption{Nasa Battery 1\_10 Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nasa Battery 2_20_test_performance.pdf}
+        \caption{Nasa Battery 2\_20 Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nasa Battery 2_20_expression_size.pdf}
+        \caption{Nasa Battery 2\_20 Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nikuradse-I_test_performance.pdf}
+        \caption{Nikuradse-I Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nikuradse-I_train_performance.pdf}
+        \caption{Nikuradse-I Train Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nikuradse-I_expression_size.pdf}
+        \caption{Nikuradse-I Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nikuradse-II_test_performance.pdf}
+        \caption{Nikuradse-II Test Performance}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Preliminary Results}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{./fig/Nikuradse-II_expression_size.pdf}
+        \caption{Nikuradse-II Expression Size}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Conclusions}
+
+    \AB{Zobrist Hashing}
+
+    \begin{itemize}
+        \item Low overhead, easy to implement, resulting in speedups and energy savings
+        \item \A{Fitness caching} may induce a more beneficial fitness landscape and prevent overfitting
+        \item \A{Novelty promotion} not as reliable in improving performance
+    \end{itemize}
+    \bigskip
+
+    \AB{Future Work}
+    \begin{itemize}
+        \item Deeper look at algorithm dynamics with caching
+        \item Improved caching strategies: LRU cache, generational
+        \item Better integration with search operators to promote novelty
+        \item Attempt to capture symmetries and other equivalent sub-expressions
+    \end{itemize}
+\end{frame}
+
+% \begin{frame}
+%     \frametitle{Preliminary Results}
+
+%     \begin{description}
+%         \item[TC] Transposition cache (fitness)
+%         \item[TO] Transposition operators (novelty)
+%     \end{description}
+
+%     \begin{table}
+%         Flow Stress, 1 gradient descent iteration\\ median test performance ($R^2$ test $\pm$ std. dev.)
+%         \medskip
+
+%         \begin{tblr}{l|rrl}
+%                    & TO=ON & TO=OFF\\
+%             \hline
+%             TC=ON  & 0.942 $\pm$ 0.555 & 0.942 $\pm$ 0.028\\
+%             TC=OFF & 0.911 $\pm$ 23.920 & 0.911 $\pm$ 0.020\\
+%         \end{tblr}
+%     \end{table}
+% \end{frame}
+
+% \begin{frame}
+%     \frametitle{Preliminary Results}
+
+%     \begin{figure}
+%         \centering
+%         \includegraphics[width=0.88\textwidth]{./fig/Flow-stress_1_cache_only.pdf}
+%         \caption{Flow Stress, 1 gradient descent iteration}
+%     \end{figure}
+% \end{frame}
+
+% \begin{frame}
+%     \frametitle{Preliminary Results}
+
+%     \begin{figure}
+%         \centering
+%         \includegraphics[width=0.88\textwidth]{./fig/Flow-stress_10_cache_only.pdf}
+%         \caption{Flow Stress, 10 gradient descent iterations}
+%     \end{figure}
+% \end{frame}
+
+% \begin{frame}
+%     \frametitle{Preliminary Results}
+
+%     \begin{figure}
+%         \centering
+%         \includegraphics[width=0.88\textwidth]{./fig/Flow-stress_50_cache_only.pdf}
+%         \caption{Flow Stress, 50 gradient descent iterations}
+%     \end{figure}
+% \end{frame}
+
+% \begin{frame}
+%     \frametitle{Preliminary Results}
+
+%     \begin{figure}
+%         \centering
+%         \includegraphics[width=0.88\textwidth]{./fig/Flow-stress_100_cache_only.pdf}
+%         \caption{Flow Stress, 100 gradient descent iterations}
+%     \end{figure}
+% \end{frame}
 \end{document}
