@@ -1,0 +1,178 @@
+%% Author_tex.tex
+%% V1.0
+%% 2012/13/12
+%% developed by Techset
+%%
+%% This file describes the coding for rstrans.cls
+
+\documentclass[openacc]{rstransa}%%%%where rstrans is the template name
+
+%%%% *** Do not adjust lengths that control margins, column widths, etc. ***
+
+%%%%%%%%%%% Defining Enunciations  %%%%%%%%%%%
+% \newtheorem{theorem}{\bf Theorem}[section]
+% \newtheorem{condition}{\bf Condition}[section]
+% \newtheorem{corollary}{\bf Corollary}[section]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Additional packages
+% \usepackage{todonotes}
+\usepackage[nopar]{kantlipsum}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usepackage{pgfplots}
+\DeclareUnicodeCharacter{2212}{−}
+\usepgfplotslibrary{groupplots,dateplot}
+\pgfplotsset{compat=newest}
+\usepackage{tikz}
+\usetikzlibrary{positioning, backgrounds, decorations, arrows, arrows.meta, patterns, shapes, fit}
+\tikzset{>=latex}
+\usepackage{forest}
+
+\usepackage{subcaption}
+% \usepackage[showframe]{geometry}
+%%%% Please insert respective article type here %%%%
+\titlehead{Research}
+
+\begin{document}
+
+%%%% Article title to be placed here
+\title{Zobrist Hash-based Duplicate Detection in Symbolic Regression}
+\author{Bogdan Burlacu}
+
+%%%% Insert author address here
+\address{University of Applied Sciences Upper Austria\\
+Heuristic and Evolutionary Algorithms Laboratory\\
+Softwarepark 11, 4232, Hagenberg, Austria}
+
+%%%% Subject entries to be placed here %%%%
+\subject{xxxxx, xxxxx, xxxx}
+
+%%%% Keyword entries to be placed here %%%%
+\keywords{xxxx, xxxx, xxxx}
+
+%%%% Insert corresponding author and its email address}
+\corres{Bogdan Burlacu\\
+\email{bogdan.burlacu@fh-ooe.at}}
+
+%%%% Abstract text to be placed here %%%%%%%%%%%%
+\begin{abstract}
+    \kant[1-2]
+    % The evolutionary search in genetic programming may visit the same points in solution space multiple times, which affects efficiency and overall odds of convergence. This work introduces a method for avoiding duplicate exploration through an efficient detection mechanism for already seen solutions, based on the concept of Zobrist hashing. This type of hashing, frequently used in abstract board games, allows the efficient construction and subsequent update of transposition tables (essentially, a cache of previously seen solutions) during the run, thus providing the ability to detect duplicates during the recombination phase of the evolutionary algorithm.
+    % We prototype this idea using the open-source symbolic regression library Operon and perform empirical testing on a number of synthetic and real-world datasets. Furthermore, we investigate the ability of the Zobrist-based approach to cover an artificial set of solution points generated exhaustively by a deterministic approach. The results show that our approach provides a reliable way of avoiding the evaluation of duplicate solutions during the search, with a moderate amount of overhead.
+\end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%% Insert the texts which can accomdate on firstpage in the tag "fmtext" %%%%%
+
+% \begin{fmtext}
+
+% \end{fmtext}
+
+% %%%%%%%%%%%%%%% End of first page %%%%%%%%%%%%%%%%%%%%%
+
+\maketitle
+
+\section{Introduction}
+
+Symbolic Regression (SR) has been rapidly emerging as a key approach in machine learning in recent years due to the widespread acceptance of interpretability as an unequivocally crucial element of trust in AI~\cite{rudin2022}. Compared to ``black-box'' models such as deep neural networks or support vector machines, whose decision-making processes are opaque and not easily understood by humans, models produced by SR are given in the form of mathematical expressions that are, to a large extent, fathomable, simple and insightful.
+%
+Its ``white-box'' characteristics make SR an invaluable tool for scientific discovery in many application domains, such as astrophysics~\cite{matchev2022,bartlett2024}, clinical decision support~\cite{lacava2023}, controller design~\cite{danai2021}, materials science~\cite{wang2019,wang2022,wang2024}, particle kinematics~\cite{dong2023,morales-alvarado2024}, physical law discovery~\cite{desmond2023,lemos2023,grayeli2024}, or robotics~\cite{zhang2023}.
+%
+SR distinguishes itself from other regression methods that are also capable of producing symbolic models (e.g. polynomial models up to a given degree) by its ability to learn from data without requiring an \emph{a priori} specification of the model structure. In SR, both model structure and parameters are simultaneously developed, allowing for much greater expressive power and flexibility.
+
+Despite a recent emergence of many competing approaches, based on deep learning~\cite{petersen2021,kamienny2022,landajuela2022,vastl2024}, neural networks~\cite{sahoo2018}, grammar enumeration~\cite{worm2013}, mixed-integer nonlinear programming~\cite{cozad2018}, path-wise regularized learning\cite{mcconaghy2011}, or exhaustive search~\cite{kammerer2020,bartlett2024}, Genetic Programming~\cite{koza1992} (GP), a bio-inspired metaheuristic operating after the model of natural selection, remains the most successful and overall best performing approach for SR~\cite{lacava2021,defranca2024}.
+%
+However, while undeniably powerful, GP-based SR still suffers from the intrinsic limitations of evolutionary methods, such as high computational cost, search inefficiency~\cite{kronberger2024}, diversity loss and risk of premature convergence~\cite{burks2015,chen2021}. These limitations are compounded by the non-deterministic nature of the search which makes it necessary to perform multiple algorithmic runs to get reliable estimates.
+
+This work proposes an approach for mitigating these limitations by caching duplicate expressions encountered during the search, precluding the need for solution re-evaluation and saving execution time. Our method is based on the Zobrist hash, commonly used to detect transpositions in board games like Chess and Go. In our case, a transposition is defined as a sequence of recombination operations (crossover or mutation) that leads to an already-seen expression. In what follows, we show that transpositions occur frequently in SR.
+
+XXX TODO paper structure
+
+The paper is structured as follows. Section~\ref{sec:genetic-programming} offers a more detailed discussion of GP.
+
+\section{Symbolic Regression with Genetic Programming}\label{sec:genetic-programming}
+
+Genetic Programming~\cite{koza1992} is a metaheuristic optimization method that performs a \emph{global search} in solution space by orchestrating the evolution of a \textit{population} of computer programs using the basic mechanisms of \textit{selection} and \textit{recombination}.
+%
+Each program, called an \textit{individual}, in keeping with the biological metaphor, contains instructions for solving the problem at hand and its \textit{fitness} measures its ability to achieve the problem objectives\footnote{The actual representation and fitness measure are problem-dependent.}. Starting with a random initial population, in each iteration of the algorithm, the fittest individuals are selected for reproduction and subsequently swap parts of their structure to produce potentially fitter offspring. The process continues for a fixed number of iterations or until convergence, according to the workflow described in~\autoref{fig:gp-workflow}.
+
+\begin{figure}
+    \input{./fig/gp-workflow-tikz.tex}\vspace{-2em}
+    \caption{Evolutionary workflow of Genetic Programming}
+    \label{fig:gp-workflow}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \input{./fig/symreg-tree-example.tex}
+    \caption{Example tree representations with preorder traversal indices shown in red.}
+    \label{fig:sr-tree-example}
+\end{figure}
+
+In GP-based SR, the tree representation encodes mathematical expressions, as illustrated in~\autoref{fig:sr-tree-example}. SR performs a search of the space of mathematical expressions by gradually assembling tree structures from a pre-configured set of functions and terminals.
+%
+Given a set of binary (e.g. $+, -, \times, \div, \mathrm{pow}, \mathrm{aq}, \dots$), unary (e.g. $\sin, \cos, \exp, \log, \sqrt{\cdot}, \dots$) and nullary (i.e. variables and parameters) operators, the search space is defined as all valid compositions of operators (subject to some size constraints), making it a discrete combinatorial search space whose dimension scales exponentially with the number of operators.
+
+\begin{figure}
+    \input{./fig/gp-crossover.tex}
+    \caption{Crossover between two parent tree-encoded expressions. A new symbolic expression $f_3(\mathbf{x}) = (x_1 + x_2){x_3^2}$ is obtained by exchanging the parts $(x_3-x_4)$ and $x_3^2$ between the parents.}\label{fig:gp-crossover}
+\end{figure}
+
+% \subsubsection*{Evolutionary Dynamics}
+
+The successful exploration of the search space depends on the existence of a sufficiently diverse set of individuals in the population, from which adaptive change can emerge as the product of recombination. At the same time, successful \textit{exploitation}, understood as the local improvement of solutions in the vicinity of optima points, requires a focusing of the search effort and depends on the selection mechanism's ability to concentrate the population on promising regions of the search space.
+%
+A balance between these two antagonistic aspects of the search is difficult to achieve since it requires a deep understanding of evolutionary dynamics and is, in general, problem-dependent~\cite{crepinsek2013}. A good trade-off depends on appropriate settings for parameters such as the population size, crossover and mutation probabilities or selection pressure. The latter plays a particularly important role, since it controls the survival and reproduction rates of fit individuals.
+
+Selection in a finite population causes diversity loss due to duplication of fit individuals\cite{prugel-bennett2000}. In tournament selection, the most popular selection mechanism in SR, this effect was shown to be significant even at small tournament sizes\cite{xie2011}. A simulation of tournament selection in \autoref{fig:tournament-selection-pressure} shows that at least 40\% of individuals are lost in every generation.
+%
+Diversity has an impact on search convergence, as the outcome of recombination will depend on the amount of genetic material shared by the parents. The more similar the parents, the more likely a significant amount of duplicate material will be inherited by the child.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{./fig/tournament_selection_pressure.pdf}
+    \caption{Percentage of not selected individuals as a function of tournament size}\label{fig:tournament-selection-pressure}
+\end{figure}
+
+From a practical perspective, given the unavoidable loss of diversity over the course of evolution, it is reasonable to assume that some solutions produced by recombination will not be unique, and their initial evaluations could be reused, with significant runtime benefits. Furthermore, detecting when duplicates \textit{may} occur or detecting the \textit{frequency} of duplicate individuals in the population may also lead to better strategies for diversity maintenance.
+%
+
+Previous attempts to improve runtime efficiency focused on alternative representations, for example storing the population as a graph\cite{handley1994,keijzer2004,defranca2025} or subtree caching\cite{wong2008}. The caching approach is of particular interest here as it does not require changing the structure of the algorithm. However, implementing an efficient cache requires an accurate, low-overhead hashing function, with certain desirable properties such as hash involution. This paper introduces a hashing approach based on Zobrist keys that allows the caching of expression trees with minimal overhead, whose inner workings are described in the following section.
+
+
+\section{Duplicate Detection in Symbolic Regression}\label{sec:duplicate-detection}
+
+Duplicate detection in SR populations is challenging because of the need to compute distances between unordered labeled trees, a problem known to be NP-complete\cite{zhang1992}. However, if one relaxes the problem to approximate matching, then hash-based tree isomorphism offers similar results with a marginal error bound by the collision rate\footnote{Perfect hashes are not considered due to their high computational cost.}. Hash functions based on modular arithmetic\cite{wong2008} or Merkle trees\cite{burlacu2019} have been previously used in SR to improve runtime and detect structural and semantic duplicates, but due to their logarithmic time complexity, their overhead remains significant.
+
+Zobrist hashing, named after its inventor Albert Zobrist, is a hashing technique primarily used in computer game algorithms, particularly for board games such as Chess and Go.
+%
+At its core, Zobrist hashing involves assigning a unique random number to each possible piece on each possible square of the game board. For instance, in chess, each combination of piece type and board position is mapped to a distinct random number. The hash value of a particular board state is then computed by performing a bitwise XOR (exclusive OR) operation on the numbers corresponding to the pieces present on the board.
+
+The Zobrist hash has excellent runtime properties as XOR operations are generally very well-optimized on modern CPUs due to their simplicity and suitability for parallel execution. But the main advantage of Zobrist hashing becomes apparent when considering the mathematical properties of the XOR function, namely associativity, commutativity and involution.
+\begin{align*}
+    a \oplus b &= b \oplus a & & \text{(associativity)}\\
+    a \oplus (b \oplus c) &= (a \oplus b) \oplus c & & \text{(commutativity)}\\
+    a \oplus b \oplus b &= a & & \text{(involution)}\\
+\end{align*}
+Given an abstract board game whose state can be reached through different move orders, the XOR function enables the incremental update of the game state by only considering changes to the board position after a move is made. In other words, previously visited states can be identified regardless of move order. This helps tree search algorithms such as \emph{Minimax} avoid already-visited nodes in the search tree, by maintaining a data structure called a \emph{transposition table} -- a database that stores results of previously performed searches -- greatly improving search efficiency.
+
+The same approach is applicable to SR, considering the tree node type and its preorder index as the tabular coordinates for retrieving the associated Zobrist key, as illustrated in \autoref{fig:zobrist-tree-example}. When two parent trees are crossed-over, the child hash will not be recomputed but instead updated with the hashes of the swapped subtrees\footnote{The incremental update will be faster when the cumulated length of the swapped subtrees is smaller than the length of $T_1$.}. For example, the hash of the child individual from~\autoref{fig:gp-crossover} is obtained by:
+\[
+    \mathcal{H}(C_1) = \mathcal{H}(T_1) \oplus {\color{green!60!black}\underbrace{h_{-,4} \oplus h_{x_3,5} \oplus h_{x_4, 6}}_{\text{XOR ``out'' $(x_3 - x_4)$}}} \oplus {\color{blue} \underbrace{h_{\centerdot^2,4} \oplus  h_{x_3, 5}}_{\text{XOR ``in'' $x_3^2$}}}
+\]
+
+\begin{figure}
+    \input{./fig/zobrish-hash.tex}
+    \caption{$\mathcal{H}(T) = h_{\times,0} \oplus h_{+, 1} \oplus h_{x_1, 2} \oplus h_{x_2, 3} \oplus h_{-,4} \oplus h_{x_3, 5} \oplus h_{x_4, 6}$}
+    \label{fig:zobrist-tree-example}
+\end{figure}
+
+% In this paper, we show that the same concept is applicable to Symbolic Regression, where the search space, consisting of mathematical expressions encoded in tree form, is explored through the repeated application of the so-called recombination operators: \emph{crossover} and \emph{mutation}. These operators combine or modify parts of existing expressions randomly, having a high probability of generating previously-seen expressions, particularly in the later stages of the search when most of the initial genetic diversity is lost.
+
+\newpage % remove me
+\bibliographystyle{RS}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,46 @@
+\begin{subfigure}[b][3cm]{0.5\textwidth}
+    Expression tree $T$
+
+    \begin{forest}
+        [{$^{\color{red} 0}\times$}, name=n0
+            [{$^{\color{red} 1}+$}, name=n1
+                [{$^{\color{red}2}x_1$}, name=n2]
+                [{$^{\color{red}3}x_2$}, name=n3]
+            ]
+            [{$^{\color{red}4}-$}, name=n4
+                [{$^{\color{red}5}x_3$}, name=n5]
+                [{$^{\color{red}6}x_4$}, name=n6]
+            ]
+        ]
+        \node[below=of n0, yshift=-1cm] {
+            $f_1(\mathbf{x}) = (x_1 + x_2) \times (x_3 - x_4)$
+        };
+    \end{forest}
+    \smallskip
+
+    Prefix representation
+
+    \begin{tabular}{ccccccc}
+        $\times$ & $+$ & $x_1$ & $x_2$ & $-$ & $x_3$ & $x_4$\\
+        0 & 1 & 2 & 3 & 4 & 5 & 6\\
+    \end{tabular}
+
+    \vspace{-1.81cm}
+\end{subfigure}\begin{subfigure}[b][3cm]{0.5\textwidth}
+    Zobrist table\smallskip
+
+    \begin{tabular}{c|p{3cm}}
+        $+$ & \\
+        $-$ & \\
+        $\times$ & \\
+        $\div$ & \\
+        $\vdots$ & Filled with\newline random values\\
+        $x_1$ & \\
+        $x_2$ & \\
+        $x_3$ & \\
+        $x_4$ & \\
+        $c$   & \\
+        \hline
+        & position $i = 0,\dots,N$\\
+    \end{tabular}
+\end{subfigure}

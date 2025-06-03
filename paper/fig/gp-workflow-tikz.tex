@@ -1,0 +1,39 @@
+\begin{tikzpicture}[node distance=0.5cm and 0.5cm]
+    \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=rectangle,draw,fill=black,text=white,inner sep=2pt] (char) {#1};}}
+    \tikzset{mynode/.style={align=justify, text width=0.928\textwidth, inner sep=5pt, draw, fill=abstractcolor}}
+    \node[mynode] (a) { \textsc{\textbf{\circled{1} Initialization}}\\
+        In the initialization phase, the population is filled with random trees of varying length, depth or symbol composition, up to a pre-specified maximum length. Initialization will ideally ensure that all regions of the solution space are sampled uniformly, such that at least some solution candidates will sample promising regions of the search space.
+    };
+
+    \node[mynode, below=of a] (b) { \textsc{\textbf{\circled{2} Fitness evaluation}}\\
+        The fitness evaluation phase assigns fitness values to new individuals by measuring their error on the training data. Metrics such as the mean squared error or coefficient of determination are typically used, while in multi-objective variants of SR some parsimony measure such as the model length is also included. The evaluation step is often extended with a local search in each solution candidate's parameter space, in order to ensure that each model considered has appropriate coefficients. Gradient descent-based local search has been shown to greatly benefit the solution quality and convergence speed of SR~\cite{kommenda2020,burlacu2024}. Due to its high computational cost, evaluation makes up most of the algorithm runtime.
+    };
+
+    \node[mynode, below=of b] (c) { \textsc{\textbf{\circled{3} Parent selection}}\\
+        Selection can be seen as the driving force of the evolutionary algorithm. Individuals are chosen to become parents with a probability proportional to their fitness. Selection in GP is done with replacement and fit individuals can get selected for recombination multiple times. This is the main mechanism through which fit genes increase in frequency, to the detriment of unfit ones. In effect, this moves the population of solution candidates towards local optima in solution space, increasing average fitness but decreasing genetic diversity.
+    };
+
+    \node[mynode, below=of c] (d) { \textsc{\textbf{\circled{4} Recombination}}\\
+        In the recombination phase, crossover and/or mutation are probabilistically applied to the parent individuals in order to generate new child individuals. Both crossover and mutation are indispensable operators for a successful search.\vspace{-1.2em}
+        \paragraph{Crossover} plays a key role as the primary mechanism for exploration. The idea behind this operator is that good solutions will contain useful sub-expressions that can be reused and reassembled in more advantageous ways. Typically, crossover is applied with very high probability ($p_\mathit{crossover} > 0.9$).\vspace{-1.2em}
+        \paragraph{Mutation} is not so effective for exploration but plays an important role as a mechanism for exploitation (fine-tuning solutions) and for counteracting diversity loss. Mutation can insert, replace or remove subtrees or perturb node coefficient values. Typically, mutation is applied with a lower probability ($p_\mathit{mutation} < 0.25$).
+    };
+
+    \node[below=of d, yshift=-5pt, minimum height=0pt, minimum width=0pt, text width=0pt] (e) {};
+
+    \node[right=of b, inner sep=0pt, outer sep=0pt, minimum size=0pt] (x1) {};
+    \node[right=of d, inner sep=0pt, outer sep=0pt, minimum size=0pt] (x2) {};
+
+    % \node[draw, below=of d, fill=abstractcolor] (e) { \textsc{\textbf{Reinsertion}}\\
+    %     Selection can be seen as the driving force of the evolutionary algorithm. Individuals are chosen to become parents with a probability proportional to their fitness. Selection in GP is done with replacement and fti individuals can get selected for recombination multiple times. This is the main mechanism through which fti genes increase in frequency, to the detriment of unfit ones. In effect, this moves the population of solution candidates towards local optima in solution space, increasing average fitness but decreasing genetic diversity.
+    % };
+
+    \draw[-Latex] (a) -- (b);
+    \draw[-Latex] (b) -- (c);
+    \draw[-Latex] (c) -- (d);
+    \draw[-Latex] (d) -- node[minimum height=0pt, minimum width=0pt, text width=46pt, anchor=west]{ \textbf{Terminate} } (e);
+    \draw (d.east) -- ++(0.5cm,0) (x1.center);
+    \draw[Latex-] (b.east) -- ++(0.5cm,0) (x2);
+    \draw (x1) -- (x2) node[label={[rotate=90, midway]\textbf{Continue}}] {} ;
+\end{tikzpicture}

@@ -1,0 +1,58 @@
+\begin{subfigure}[b]{0.42\textwidth}
+    \centering
+    Parent tree $T_1$\\
+    \begin{forest}
+        [{$^{\color{red} 0}\times$}, name=n0
+            [{$^{\color{red} 1}+$}, name=n1
+                [{$^{\color{red}2}x_1$}, name=n2]
+                [{$^{\color{red}3}x_2$}, name=n3]
+            ]
+            [{$^{\color{red}4}-$}, name=n4
+                [{$^{\color{red}5}x_3$}, name=n5]
+                [{$^{\color{red}6}x_4$}, name=n6]
+            ]
+        ]
+        \begin{scope}[on background layer]
+            \node[fill=orange!15, inner sep=0pt, rectangle, rounded corners, fit=(n4) (n5) (n6)] {};
+        \end{scope}
+    \end{forest}\\
+    $f_1(\mathbf{x}) = (x_1 + x_2) \times (x_3 - x_4)$
+\end{subfigure}
+\begin{subfigure}[b]{0.29\textwidth}
+    \centering
+    Parent tree $T_2$\\
+    \begin{forest}
+        [{$^{\color{red} 0}\div$}, name=n0
+            [{$^{\color{red} 1}\times$}, name=n1
+                [{$^{\color{red}2}x_1$}, name=n2]
+                [{$^{\color{red}3}x_2$}, name=n3]
+            ]
+            [{$^{\color{red}4}\centerdot^2$}, name=n4
+                [{$^{\color{red}5}x_3$}, name=n5]
+            ]
+        ]
+        \begin{scope}[on background layer]
+            \node[fill=green!20, inner sep=0pt, rectangle, rounded corners, fit=(n4) (n5)] {};
+        \end{scope}
+    \end{forest}\\
+    $f_2(\mathbf{x}) = {x_1 x_2}/{x_3^2}$
+\end{subfigure}
+\begin{subfigure}[b]{0.25\textwidth}
+    \centering
+    Child tree $C_1$\\
+    \begin{forest}
+        [{$^{\color{red} 0}\times$}, name=n0
+            [{$^{\color{red} 1}+$}, name=n1
+                [{$^{\color{red}2}x_1$}, name=n2]
+                [{$^{\color{red}3}x_2$}, name=n3]
+            ]
+            [{$^{\color{red}4}\centerdot^2$}, name=n4
+                [{$^{\color{red}5}x_3$}, name=n5]
+            ]
+        ]
+        \begin{scope}[on background layer]
+            \node[fill=green!20, inner sep=0pt, rectangle, rounded corners, fit=(n4) (n5)] {};
+        \end{scope}
+    \end{forest}\\
+    $f_3(\mathbf{x}) = (x_1 + x_2){x_3^2}$
+\end{subfigure}

@@ -1,0 +1,32 @@
+\begin{tikzpicture}
+    \node[align=center] (n1) {
+        \begin{forest}
+            [$^{\color{red} 0}\times$ [$^{\color{red} 1}+$ [$^{\color{red}2}x_1$] [$^{\color{red}3}x_2$]] [$^{\color{red}4}-$ [$^{\color{red}5}x_3$] [$^{\color{red}6}x_4$]]]
+        \end{forest}\\
+
+        $f(\mathbf{x}) = (x_1 + x_2)(x_3 - x_4)$
+    };
+
+    \node[align=center, right=of n1] (n2) {
+        \begin{forest}
+            [ $^{\color{red} 0}\div$
+                [ $^{\color{red} 1}\sin$ [$^{\color{red} 2}x$] ]
+                [ $^{\color{red} 3}\cos$ [$^{\color{red} 4}x$] ]
+            ]
+        \end{forest}\\
+
+        $f(\mathbf{x}) = \sin(x_1)/\cos(x_2)$
+    };
+
+    \node[align=center, right=of n2] (n3) {
+        \begin{forest}
+            [ $^{\color{red} 0}\sqrt{~}$
+                [ $^{\color{red} 1}+$
+                    [ $^{\color{red} 2}1$ ]
+                    [ $^{\color{red} 3}x_1^2$ ]
+                ]
+            ]
+        \end{forest}\\
+        $f(\mathbf{x}) = \sqrt{1 + x_1^2}$
+    };
+\end{tikzpicture}

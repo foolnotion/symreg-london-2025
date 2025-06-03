@@ -1,0 +1,32 @@
+% \begin{tikzpicture}[minimum height=0.7cm, node distance=0.5cm and 1cm]
+%     \tikzset{every node/.style={align=center, text width=2.5cm, inner sep=5pt}}
+%     \node[draw] (a) { Initialization };
+%     \node[draw, below=of a] (b) { Calculate fitness };
+%     \node[draw, below=of b] (c) { Selection };
+%     \node[draw, below=of c] (d) { Recombination };
+%     \node[draw, align=center, text width=0.8cm, diamond, aspect=2, below=of d] (e) { Stop? };
+
+%     \node[below=of e] (f) { };
+
+%     \draw[-Latex] (a) -- (b);
+%     \draw[-Latex] (b) -- (c);
+%     \draw[-Latex] (c) -- (d);
+%     \draw[-Latex] (d) -- (e);
+%     \draw[-Latex] (e.east) -- node[align=left, anchor=south, xshift=1cm]{\textbf{No}} ++ (1cm,0) |- (b.east);
+%     \draw[-Latex] (e.south) -- node[anchor=west, text width=14pt, minimum width=0cm] { \textbf{Yes} } (f);
+% \end{tikzpicture}
+
+\begin{algorithmic}[1]
+    \Procedure{Genetic Programming}{}
+        \State \textbf{initialization}: random starting point or collection of points in the solution space
+        \State \textbf{fitness evaluation}: assign fitness values to the initial solutions
+
+        \While{stopping criterion not satisfied}
+            \State \textbf{parent selection}: select parent individuals for recombination based on fitness
+            \State \textbf{recombination}: generate new child individuals from the selected parents
+            \State \textbf{fitness evaluation}: assign fitness values to the newly-generated solutions
+            \State \textbf{reinsertion}: replace parent population with newly generated child individuals
+        \EndWhile
+        \State \Return{a single solution or a Pareto front of solutions}
+    \EndProcedure
+\end{algorithmic}
