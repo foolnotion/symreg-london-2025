@@ -31,7 +31,10 @@
 \usepackage{forest}
 
 \usepackage{subcaption}
-% \usepackage[showframe]{geometry}
+\usepackage{tabularray}
+\usepackage{siunitx}
+\sisetup{round-mode=places,round-precision=2}
+
 %%%% Please insert respective article type here %%%%
 \titlehead{Research}
 
@@ -55,6 +58,8 @@ Softwarepark 11, 4232, Hagenberg, Austria}
 %%%% Insert corresponding author and its email address}
 \corres{Bogdan Burlacu\\
 \email{bogdan.burlacu@fh-ooe.at}}
+
+\def\CPP{C\raisebox{0.5ex}{\tiny\textbf{++}}}
 
 %%%% Abstract text to be placed here %%%%%%%%%%%%
 \begin{abstract}
@@ -82,11 +87,11 @@ Its ``white-box'' characteristics make SR an invaluable tool for scientific disc
 %
 SR distinguishes itself from other regression methods that are also capable of producing symbolic models (e.g. polynomial models up to a given degree) by its ability to learn from data without requiring an \emph{a priori} specification of the model structure. In SR, both model structure and parameters are simultaneously developed, allowing for much greater expressive power and flexibility.
 
-Despite a recent emergence of many competing approaches, based on deep learning~\cite{petersen2021,kamienny2022,landajuela2022,vastl2024}, neural networks~\cite{sahoo2018}, grammar enumeration~\cite{worm2013}, mixed-integer nonlinear programming~\cite{cozad2018}, path-wise regularized learning\cite{mcconaghy2011}, or exhaustive search~\cite{kammerer2020,bartlett2024}, Genetic Programming~\cite{koza1992} (GP), a bio-inspired metaheuristic operating after the model of natural selection, remains the most successful and overall best performing approach for SR~\cite{lacava2021,defranca2024}.
+Despite a recent emergence of many competing approaches, based on deep learning~\cite{petersen2021,kamienny2022,landajuela2022,vastl2024}, neural networks~\cite{sahoo2018}, grammar enumeration~\cite{worm2013}, mixed-integer nonlinear programming~\cite{cozad2018}, path-wise regularized learning\cite{mcconaghy2011}, or exhaustive search~\cite{kammerer2020,bartlett2024}, Genetic Programming~\cite{koza1992} (GP), a biologically-inspired metaheuristic operating after the model of natural selection, remains the most successful and overall best performing approach for SR~\cite{lacava2021,defranca2024}.
 %
-However, while undeniably powerful, GP-based SR still suffers from the intrinsic limitations of evolutionary methods, such as high computational cost, search inefficiency~\cite{kronberger2024}, diversity loss and risk of premature convergence~\cite{burks2015,chen2021}. These limitations are compounded by the non-deterministic nature of the search which makes it necessary to perform multiple algorithmic runs to get reliable estimates.
+However, while undeniably powerful, GP-based SR still suffers from the intrinsic limitations of evolutionary methods, such as high computational cost, search inefficiency~\cite{kronberger2024}, diversity loss and risk of premature convergence~\cite{burks2015,chen2021}. These limitations are further compounded by the non-deterministic nature of the search which makes it necessary to perform multiple algorithmic runs to get reliable estimates.
 
-This work proposes an approach for mitigating these limitations by caching duplicate expressions encountered during the search, precluding the need for solution re-evaluation and saving execution time. Our method is based on the Zobrist hash, commonly used to detect transpositions in board games like Chess and Go. In our case, a transposition is defined as a sequence of recombination operations (crossover or mutation) that leads to an already-seen expression. In what follows, we show that transpositions occur frequently in SR.
+In this work we introduce an approach for mitigating these limitations by caching duplicate expressions encountered during the search, precluding the need for solution re-evaluation and saving execution time. Our method is based on the Zobrist hash, commonly used to detect transpositions in board games like Chess and Go. In our case, a transposition is defined as a sequence of recombination operations (crossover or mutation) that leads to an already-seen expression. In what follows, we show that transpositions occur frequently in SR.
 
 XXX TODO paper structure
 
@@ -120,8 +125,6 @@ Given a set of binary (e.g. $+, -, \times, \div, \mathrm{pow}, \mathrm{aq}, \dot
     \caption{Crossover between two parent tree-encoded expressions. A new symbolic expression $f_3(\mathbf{x}) = (x_1 + x_2){x_3^2}$ is obtained by exchanging the parts $(x_3-x_4)$ and $x_3^2$ between the parents.}\label{fig:gp-crossover}
 \end{figure}
 
-% \subsubsection*{Evolutionary Dynamics}
-
 The successful exploration of the search space depends on the existence of a sufficiently diverse set of individuals in the population, from which adaptive change can emerge as the product of recombination. At the same time, successful \textit{exploitation}, understood as the local improvement of solutions in the vicinity of optima points, requires a focusing of the search effort and depends on the selection mechanism's ability to concentrate the population on promising regions of the search space.
 %
 A balance between these two antagonistic aspects of the search is difficult to achieve since it requires a deep understanding of evolutionary dynamics and is, in general, problem-dependent~\cite{crepinsek2013}. A good trade-off depends on appropriate settings for parameters such as the population size, crossover and mutation probabilities or selection pressure. The latter plays a particularly important role, since it controls the survival and reproduction rates of fit individuals.
@@ -139,12 +142,12 @@ Diversity has an impact on search convergence, as the outcome of recombination w
 From a practical perspective, given the unavoidable loss of diversity over the course of evolution, it is reasonable to assume that some solutions produced by recombination will not be unique, and their initial evaluations could be reused, with significant runtime benefits. Furthermore, detecting when duplicates \textit{may} occur or detecting the \textit{frequency} of duplicate individuals in the population may also lead to better strategies for diversity maintenance.
 %
 
-Previous attempts to improve runtime efficiency focused on alternative representations, for example storing the population as a graph\cite{handley1994,keijzer2004,defranca2025} or subtree caching\cite{wong2008}. The caching approach is of particular interest here as it does not require changing the structure of the algorithm. However, implementing an efficient cache requires an accurate, low-overhead hashing function, with certain desirable properties such as hash involution. This paper introduces a hashing approach based on Zobrist keys that allows the caching of expression trees with minimal overhead, whose inner workings are described in the following section.
+Previous attempts to improve runtime efficiency focused on alternative representations, for example storing the population as a graph\cite{handley1994,keijzer2004,defranca2025} or subtree caching\cite{wong2008}. The caching approach is of particular interest here as it does not require changes to the fundamental structure of the algorithm. However, implementing an efficient cache requires an accurate, low-overhead hashing function, with certain desirable properties such as hash involution. This paper introduces a hashing approach based on Zobrist keys that allows the caching of expression trees with minimal overhead, whose inner workings are described in the following section.
 
 
 \section{Duplicate Detection in Symbolic Regression}\label{sec:duplicate-detection}
 
-Duplicate detection in SR populations is challenging because of the need to compute distances between unordered labeled trees, a problem known to be NP-complete\cite{zhang1992}. However, if one relaxes the problem to approximate matching, then hash-based tree isomorphism offers similar results with a marginal error bound by the collision rate\footnote{Perfect hashes are not considered due to their high computational cost.}. Hash functions based on modular arithmetic\cite{wong2008} or Merkle trees\cite{burlacu2019} have been previously used in SR to improve runtime and detect structural and semantic duplicates, but due to their logarithmic time complexity, their overhead remains significant.
+Duplicate detection in SR populations is challenging because of the need to compute distances between unordered labeled trees, a problem known to be NP-complete\cite{zhang1992}. However, if one relaxes the problem to approximate matching, then hash-based tree isomorphism offers similar results with a marginal error bounded by the collision rate\footnote{Perfect hashes are not considered due to their high computational cost.}. Hash functions based on modular arithmetic\cite{wong2008} or Merkle trees\cite{burlacu2019} have been previously used in SR to improve runtime and detect structural and semantic duplicates, but due to their logarithmic time complexity, their overhead remains significant.
 
 Zobrist hashing, named after its inventor Albert Zobrist, is a hashing technique primarily used in computer game algorithms, particularly for board games such as Chess and Go.
 %
@@ -164,14 +167,108 @@ The same approach is applicable to SR, considering the tree node type and its pr
 \]
 
 \begin{figure}
-    \input{./fig/zobrish-hash.tex}
+    \input{./fig/zobrish-hash.tex}\vspace{1.5em}
     \caption{$\mathcal{H}(T) = h_{\times,0} \oplus h_{+, 1} \oplus h_{x_1, 2} \oplus h_{x_2, 3} \oplus h_{-,4} \oplus h_{x_3, 5} \oplus h_{x_4, 6}$}
     \label{fig:zobrist-tree-example}
 \end{figure}
 
-% In this paper, we show that the same concept is applicable to Symbolic Regression, where the search space, consisting of mathematical expressions encoded in tree form, is explored through the repeated application of the so-called recombination operators: \emph{crossover} and \emph{mutation}. These operators combine or modify parts of existing expressions randomly, having a high probability of generating previously-seen expressions, particularly in the later stages of the search when most of the initial genetic diversity is lost.
+% \subsubsection*{Zobrist-based Cache Implementation}
 
-\newpage % remove me
+\subsubsection*{Implementation}
+
+We are interested in implementing a cache that can store and retrieve the fitness values of visited solutions. The following components are necessary:
+
+\paragraph{Zobrist table} The table is initialized with random values corresponding to each symbol $\times$ position combination, as illustrated in the right-hand side of figure~\autoref{fig:zobrist-tree-example}.
+%
+Its shape will be an $n\times l$ matrix where the number of symbols $n$ and the number of indices $l$ are given by:
+\begin{align}
+    n &= \underbrace{|\text{binary operators}| + |\text{unary operators|}}_\text{function nodes} + \underbrace{|\text{nullary operators}|}_\text{terminal nodes}\\
+    l &= \text{the maximum tree length}
+\end{align}
+For example, if the primitive set contains $20$ symbols and the maximum tree length is $50$, then the Zobrist table will contain $1000$ values. To avoid hash collisions, we use 64-bit values generated with a high-quality pseudo-random number generator\footnote{We use the excellent general-purpose \texttt{xoshiro256**} generator from URL.}\cite{blackman2021}.
+
+\paragraph{Zobrist hash function} The hash function iterates over tree nodes in preorder and aggregates the corresponding values from the Zobrist table using the XOR operation:
+\begin{align}
+    \mathcal{H}(T) = \bigoplus_{i=1}^{|T|} h\left( s_i, i \right)
+\end{align}
+where $T$ is a tree, $s_i$ is the symbol at position $i$ and $h(s_i, i)$ is a hash retrieval function:
+\begin{align}
+    h(s_i, i) = \begin{cases}
+        \texttt{zobrist}(s_i, i) \oplus \texttt{id}(s_i) & \text{if $s_i$ is a variable} \\
+        \texttt{zobrist}(s_i, i) & \text{otherwise}
+    \end{cases}
+\end{align}
+%
+In the case of variables, each Zobrist table value is XOR'd with a unique identifier associated with each variable. This definition of $h$ is necessary in order to treat variables as distinct symbols within this convention such that, for example, $\mathcal{H}({x_1}) \neq \mathcal{H}\left({x_2}\right)$.
+
+Additionally, many SR implementations associate multiplicative coefficients with each tree node in order to enable a more granular fine-tuning of the model using local search. In this case, model coefficients can be included in the hash by XOR-ing their respective values into the corresponding node hash.
+
+The cache is then implemented as a \texttt{hash\_map} object that maps Zobrist hash values to fitness. Integration with the workflow in~\autoref{fig:gp-workflow} is straightforward -- the logic needs to be slightly adapted to only re-evaluate a solution if it has not been cached before:
+
+\begin{algorithmic}[1]
+    \Procedure{Cached Fitness Evaluation}{$T$}
+        \State $h \gets \mathcal{H}(T)$
+        \If{$\texttt{cache}(h) = \emptyset$}
+            \State $\texttt{cache}(h) \gets \textsc{EvaluateFitness}(T)$
+        \EndIf
+        \State \Return $\texttt{cache}(h)$
+    \EndProcedure
+\end{algorithmic}
+
+As the most runtime critical part of the approach, the hash map implementation must be highly efficient and support concurrent read/write operations.
+%
+Our approach is integrated with the Operon library\cite{burlacu2020} which provides an efficient \CPP{} implementation of SR.
+
+\section{Results}
+
+We test the caching approach on a number of real-world datasets illustrated in~\autoref{tab:test-problems}.
+
+\begin{table}
+    \centering
+    \begin{tblr}{
+        colspec={lrrr},
+        row{1} = {font=\bfseries}
+    }
+        Name & Features & Training size & Test size\\
+        Chemical-I\cite{kordon2008} & 25 & 3136 & 1863\\
+        Chemical-II\cite{kordon2008} & 57 & 711 & 355\\
+        Flow stress\cite{kabliman2021} & 2 & 4200 & 3600\\
+        FrictionDyn\cite{kronberger2018} & 17 & 1010 & 1016\\
+        FrictionStat\cite{kronberger2018} & 16 & 1010 & 1016\\
+        Nasa Battery 1\_10\cite{saha2007} & 6 & 504 & 132\\
+        Nasa Battery 2\_20\cite{saha2007} & 5 & 1101 & 537\\
+        Nikuradse-I\cite{nikuradse1950} & 2 & 230 & 132\\
+        Nikuradse-II\cite{nikuradse1950} & 2 & 200 & 162\\
+    \end{tblr}
+    \caption{Test problems}\label{tab:test-problems}
+\end{table}
+
+\begin{figure}
+    \centering
+
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{./fig/global_diversity.pdf}
+        \caption{Ratio of already-seen solutions}\label{fig:diversity}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{./fig/evaluation_count.pdf}
+        \caption{Solution evaluations}\label{fig:evaluation-count}
+    \end{subfigure}
+    % \caption{Evolution of structural diversity}
+    % \label{fig:diversity}
+\end{figure}
+
+\begin{table}
+    \input{./fig/results_mdl.tex}
+    \caption{Test performance expressed as median test $R^2 \pm \sigma$}
+\end{table}
+
+% \begin{table}
+%     \input{./fig/best_length_mdl.tex}
+%     \caption{Average length of the best solution $\pm \sigma$}
+% \end{table}
+
+% \newpage % remove me
 \bibliographystyle{RS}
 \bibliography{references}
 
