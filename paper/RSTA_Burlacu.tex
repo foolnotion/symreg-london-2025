@@ -18,7 +18,7 @@
 %%%% Additional packages
 % \usepackage{todonotes}
 \usepackage[nopar]{kantlipsum}
-\usepackage{algorithm}
+\usepackage[plain]{algorithm}
 \usepackage{algpseudocode}
 
 \usepackage{pgfplots}
@@ -33,7 +33,10 @@
 \usepackage{subcaption}
 \usepackage{tabularray}
 \usepackage{siunitx}
-\sisetup{round-mode=places,round-precision=2}
+\sisetup{round-mode=places,round-precision=3}
+
+% autoref name for algorithm
+\newcommand{\algorithmautorefname}{Algorithm}
 
 %%%% Please insert respective article type here %%%%
 \titlehead{Research}
@@ -53,7 +56,7 @@ Softwarepark 11, 4232, Hagenberg, Austria}
 \subject{xxxxx, xxxxx, xxxx}
 
 %%%% Keyword entries to be placed here %%%%
-\keywords{xxxx, xxxx, xxxx}
+\keywords{symbolic regression, genetic programming, Zobrist hash, tree hashing, diversity, fitness caching}
 
 %%%% Insert corresponding author and its email address}
 \corres{Bogdan Burlacu\\
@@ -63,15 +66,13 @@ Softwarepark 11, 4232, Hagenberg, Austria}
 
 %%%% Abstract text to be placed here %%%%%%%%%%%%
 \begin{abstract}
-    \kant[1-2]
-    % The evolutionary search in genetic programming may visit the same points in solution space multiple times, which affects efficiency and overall odds of convergence. This work introduces a method for avoiding duplicate exploration through an efficient detection mechanism for already seen solutions, based on the concept of Zobrist hashing. This type of hashing, frequently used in abstract board games, allows the efficient construction and subsequent update of transposition tables (essentially, a cache of previously seen solutions) during the run, thus providing the ability to detect duplicates during the recombination phase of the evolutionary algorithm.
-    % We prototype this idea using the open-source symbolic regression library Operon and perform empirical testing on a number of synthetic and real-world datasets. Furthermore, we investigate the ability of the Zobrist-based approach to cover an artificial set of solution points generated exhaustively by a deterministic approach. The results show that our approach provides a reliable way of avoiding the evaluation of duplicate solutions during the search, with a moderate amount of overhead.
+    Symbolic regression encompasses a family of search algorithms that aim to discover the best fitting function for a set of data without requiring an \emph{a priori} specification of the model structure. The most successful and commonly used technique for symbolic regression is Genetic Programming (GP), an evolutionary search method that evolves a population of mathematical expressions through the mechanism of natural selection. In this work we analyze the efficiency of the evolutionary search in GP and show that many points in the search space are re-visited and re-evaluated multiple times by the algorithm, leading to wasted computational effort. We address this issue by introducing a caching mechanism based on the Zobrist hash, a type of hashing frequently used in abstract board games for the efficient construction and subsequent update of transposition tables. We implement our caching approach using the open-source framework Operon and demonstrate its performance on a selection of real-world regression problems, where we observe up to 34\% speedups without any detrimental effects on search quality. The hashing approach represents a straightforward way to improve runtime performance while also offering some interesting possibilities for adjusting search strategy based on cached information.
 \end{abstract}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%% Insert the texts which can accomdate on firstpage in the tag "fmtext" %%%%%
 
-% \begin{fmtext}
+% \begin{fmtext
 
 % \end{fmtext}
 
@@ -81,9 +82,9 @@ Softwarepark 11, 4232, Hagenberg, Austria}
 
 \section{Introduction}
 
-Symbolic Regression (SR) has been rapidly emerging as a key approach in machine learning in recent years due to the widespread acceptance of interpretability as an unequivocally crucial element of trust in AI~\cite{rudin2022}. Compared to ``black-box'' models such as deep neural networks or support vector machines, whose decision-making processes are opaque and not easily understood by humans, models produced by SR are given in the form of mathematical expressions that are, to a large extent, fathomable, simple and insightful.
+Symbolic Regression (SR) has been rapidly emerging as a key approach in machine learning in recent years due to the widespread acceptance of interpretability as an unequivocally crucial element of trust in AI~\cite{rudin2022}. Compared to ``black-box'' models such as deep neural networks or support vector machines with nonlinear kernels, whose decision-making processes are opaque and not easily understood by humans, models produced by SR are given in the form of mathematical expressions that are, to a large extent, fathomable, simple and insightful.
 %
-Its ``white-box'' characteristics make SR an invaluable tool for scientific discovery in many application domains, such as astrophysics~\cite{matchev2022,bartlett2024}, clinical decision support~\cite{lacava2023}, controller design~\cite{danai2021}, materials science~\cite{wang2019,wang2022,wang2024}, particle kinematics~\cite{dong2023,morales-alvarado2024}, physical law discovery~\cite{desmond2023,lemos2023,grayeli2024}, or robotics~\cite{zhang2023}.
+Its ``white-box'' characteristics make SR an invaluable tool for scientific discovery in many application domains, such as astrophysics~\cite{matchev2022,bartlett2024}, physical law discovery~\cite{desmond2023,lemos2023,grayeli2024}, materials science~\cite{wang2019,wang2022,wang2024}, particle kinematics~\cite{dong2023,morales-alvarado2024}, robotics~\cite{zhang2023}, controller design~\cite{danai2021}, or clinical decision support~\cite{lacava2023}.
 %
 SR distinguishes itself from other regression methods that are also capable of producing symbolic models (e.g. polynomial models up to a given degree) by its ability to learn from data without requiring an \emph{a priori} specification of the model structure. In SR, both model structure and parameters are simultaneously developed, allowing for much greater expressive power and flexibility.
 
@@ -93,9 +94,7 @@ However, while undeniably powerful, GP-based SR still suffers from the intrinsic
 
 In this work we introduce an approach for mitigating these limitations by caching duplicate expressions encountered during the search, precluding the need for solution re-evaluation and saving execution time. Our method is based on the Zobrist hash, commonly used to detect transpositions in board games like Chess and Go. In our case, a transposition is defined as a sequence of recombination operations (crossover or mutation) that leads to an already-seen expression. In what follows, we show that transpositions occur frequently in SR.
 
-XXX TODO paper structure
-
-The paper is structured as follows. Section~\ref{sec:genetic-programming} offers a more detailed discussion of GP.
+The paper is structured as follows. Section~\ref{sec:genetic-programming} offers a more detailed discussion of GP and argues why duplicates do occur during the search. Section~\ref{sec:duplicate-detection} explains the proposed duplicate detection mechanism and its implementation. Section~\ref{sec:results} provides empirical evidence in favor of fitness caching as a way to improve runtime, also noting a change in search dynamics with caching. Finally, Section~\ref{sec:conclusion} discusses the implications of this work and future research directions.
 
 \section{Symbolic Regression with Genetic Programming}\label{sec:genetic-programming}
 
@@ -176,7 +175,34 @@ The same approach is applicable to SR, considering the tree node type and its pr
 
 \subsubsection*{Implementation}
 
-We are interested in implementing a cache that can store and retrieve the fitness values of visited solutions. The following components are necessary:
+We base our implementation on the open-source library Operon\cite{burlacu2020} that contains a high-performance, concurrent implementation of SR in the \CPP{} programming language. The library makes use of a fine-grained concurrency model where recombination and subsequent fitness evaluation take place in parallel, such that new individuals are generated independently in separate logical threads. In order to not diminish the concurrency and scalability of the library, interposing a fitness cache between the recombination and evaluation steps requires that the cache object is able to operate in a synchronized manner -- that is, the underlying hash map object must support concurrent read/write operations.
+%
+In order to satisfy there requirements we employ a parallel hash map library\cite{popovitch2019} with the following characteristics:
+\begin{itemize}
+    \item \emph{closed hashing}: the values are stored directly in a memory array (avoiding memory indirection)
+    \item \emph{data-parallel lookup}: using vector instructions, the hash table is able to look up items by checking 16 slots in parallel
+    \item \emph{segmented design}: the hash table is internally composed of an array of submaps with internal locking (one mutex is created for each internal submap)
+    \item \emph{fine-grained locking}: separate locks for each internal submap provide a speed benefit when compared to single threaded insertion
+\end{itemize}
+
+The cache is then implemented as a \texttt{hash\_map} object that maps Zobrist hash values to fitness. Integration with the workflow in~\autoref{fig:gp-workflow} is straightforward -- the logic needs to be slightly adapted to only re-evaluate a solution if it has not been cached before, as seen in~\autoref{alg:cached-fitness}. This is implemented in Operon at the level of the recombination operation. The cache is initially updated with the initial population created by the initialization step.
+
+\begin{algorithm}
+    \begin{algorithmic}[1]
+        \Procedure{CachedFitness}{$T$}
+            \State $h \gets \mathcal{H}(T)$
+            \If{$\texttt{cache}(h) = \emptyset$}
+                \State $\texttt{cache}(h) \gets \textsc{EvaluateFitness}(T)$
+            \EndIf
+            \State \Return $\texttt{cache}(h)$
+        \EndProcedure
+    \end{algorithmic}
+    \caption{Cached fitness evaluation}
+    \label{alg:cached-fitness}
+\end{algorithm}
+
+
+In addition to the hash map object, the  following components are necessary:
 
 \paragraph{Zobrist table} The table is initialized with random values corresponding to each symbol $\times$ position combination, as illustrated in the right-hand side of figure~\autoref{fig:zobrist-tree-example}.
 %
@@ -185,7 +211,7 @@ Its shape will be an $n\times l$ matrix where the number of symbols $n$ and the 
     n &= \underbrace{|\text{binary operators}| + |\text{unary operators|}}_\text{function nodes} + \underbrace{|\text{nullary operators}|}_\text{terminal nodes}\\
     l &= \text{the maximum tree length}
 \end{align}
-For example, if the primitive set contains $20$ symbols and the maximum tree length is $50$, then the Zobrist table will contain $1000$ values. To avoid hash collisions, we use 64-bit values generated with a high-quality pseudo-random number generator\footnote{We use the excellent general-purpose \texttt{xoshiro256**} generator from URL.}\cite{blackman2021}.
+For example, if the primitive set contains $20$ symbols and the maximum tree length is $50$, then the Zobrist table will contain $1000$ values. To avoid hash collisions, we use 64-bit values generated with a high-quality pseudo-random number generator\footnote{We use the excellent general-purpose \texttt{xoshiro256**} generator from \url{https://prng.di.unimi.it}}\cite{blackman2021}.
 
 \paragraph{Zobrist hash function} The hash function iterates over tree nodes in preorder and aggregates the corresponding values from the Zobrist table using the XOR operation:
 \begin{align}
@@ -200,36 +226,37 @@ where $T$ is a tree, $s_i$ is the symbol at position $i$ and $h(s_i, i)$ is a ha
 \end{align}
 %
 In the case of variables, each Zobrist table value is XOR'd with a unique identifier associated with each variable. This definition of $h$ is necessary in order to treat variables as distinct symbols within this convention such that, for example, $\mathcal{H}({x_1}) \neq \mathcal{H}\left({x_2}\right)$.
-
-Additionally, many SR implementations associate multiplicative coefficients with each tree node in order to enable a more granular fine-tuning of the model using local search. In this case, model coefficients can be included in the hash by XOR-ing their respective values into the corresponding node hash.
-
-The cache is then implemented as a \texttt{hash\_map} object that maps Zobrist hash values to fitness. Integration with the workflow in~\autoref{fig:gp-workflow} is straightforward -- the logic needs to be slightly adapted to only re-evaluate a solution if it has not been cached before:
-
-\begin{algorithmic}[1]
-    \Procedure{Cached Fitness Evaluation}{$T$}
-        \State $h \gets \mathcal{H}(T)$
-        \If{$\texttt{cache}(h) = \emptyset$}
-            \State $\texttt{cache}(h) \gets \textsc{EvaluateFitness}(T)$
-        \EndIf
-        \State \Return $\texttt{cache}(h)$
-    \EndProcedure
-\end{algorithmic}
-
-As the most runtime critical part of the approach, the hash map implementation must be highly efficient and support concurrent read/write operations.
 %
-Our approach is integrated with the Operon library\cite{burlacu2020} which provides an efficient \CPP{} implementation of SR.
 
-\section{Results}
+\paragraph{Hashing of coefficients}
+The Operon framework as well as many other SR implementations assign a multiplicative coefficient to each tree node in order to enable a more granular fine-tuning of the model using local search. Although these node coefficients can be included in the hash by XOR-ing their respective values into the hash, we believe this to be counter-productive as it would greatly decrease the efficiency of the cache. Therefore, we restrict the tree hash to nodes without coefficients, in effect only hashing tree structure, in order to lower memory requirements, prevent the cache from growing very large and avoid storing differently parameterized versions of the same tree structure.
 
-We test the caching approach on a number of real-world datasets illustrated in~\autoref{tab:test-problems}.
+\section{Experimental Results}\label{sec:results}
+
+The purpose of our experiment is to ascertain the effectiveness of fitness caching in reducing runtime while maintaining solution quality. We therefore compare otherwise identical algorithmic configurations with and without fitness caching, using a number of real-world datasets illustrated in~\autoref{tab:test-problems}.
+%
+We employ the Non-dominated Sorting Genetic Algorithm 2 (NSGA2)~\cite{deb2002}, a multi-objective evolutionary algorithm whose selection mechanism is based on the concepts of Pareto dominance and crowding distance, to allow the simultaneous optimization of model accuracy and size.
+%
+The algorithm is configured with the hyperparameters described in~\autoref{tab:nsga2-settings}. A single best model is selected from the returned Pareto front using the Minimum Description Length principle, which favors models that provide the shortest description of the data in an information-theoretical sense\cite{grunwald2019}, therefore choosing the best compromise between error and complexity.
+
+Since the individuals are cached based only on their structure without accounting for coefficients, we employ variable amounts of local search in order to ensure that model coefficients are properly optimized before fitness is evaluated.
+%
+Recent research has shown that due to the Baldwin effect, a relatively small amount of local search is sufficient in GP~\cite{burlacu2024}. Operon performs a non-linear least squares optimization of model coefficients using the Levenberg-Marquardt algorithm\cite{gavin2019}, a Newton step-based gradient descent method where the step is adjusted to remain within a trust region using a damping factor $\lambda$. When the step is successful, the trust region is expanded by reducing $\lambda$. If the step is unsuccessful, the trust region is shrunk by increasing $\lambda$.
+
+%
+It is expected that a sufficient amount of local search will ensure that the fitness values stored in the cache are the best that can be attained for a given individual, countering the effect of hashing only the tree structure. The experiment includes a configuration with no local search (iterations set to zero), in order to analyze the effects of caching in the extreme case where no care is taken about the coefficients of the models.
+%
+We perform 100 repetitions for each problem and set of hyperparameters, for a total of 9000 algorithmic runs.
 
 \begin{table}
-    \centering
+    % \centering
     \begin{tblr}{
-        colspec={lrrr},
+        width=1.0\textwidth,
+        colspec={X[l]X[r]X[r]r},
         row{1} = {font=\bfseries}
     }
         Name & Features & Training size & Test size\\
+        \hline
         Chemical-I\cite{kordon2008} & 25 & 3136 & 1863\\
         Chemical-II\cite{kordon2008} & 57 & 711 & 355\\
         Flow stress\cite{kabliman2021} & 2 & 4200 & 3600\\
@@ -243,32 +270,91 @@ We test the caching approach on a number of real-world datasets illustrated in~\
     \caption{Test problems}\label{tab:test-problems}
 \end{table}
 
-\begin{figure}
+\begin{table}
     \centering
-
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=\textwidth]{./fig/global_diversity.pdf}
-        \caption{Ratio of already-seen solutions}\label{fig:diversity}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=\textwidth]{./fig/evaluation_count.pdf}
-        \caption{Solution evaluations}\label{fig:evaluation-count}
-    \end{subfigure}
-    % \caption{Evolution of structural diversity}
-    % \label{fig:diversity}
-\end{figure}
+    \begin{tblr}{
+        colspec={lX[l]},
+        row{1,12} = {font=\bfseries}
+    }
+    Fixed hyperparameters & Value\\
+    Population size & 1000\\
+    Function set & $+, -, \times, \div, \exp, \mathrm{logabs}, \sin, \mathrm{sqrtabs}, \mathrm{square}$\\
+    Terminal set & $\mathrm{constants}, \mathrm{variables}$\\
+    Tree initialization & balanced tree creator\cite{burlacu2020}, max initial tree length = 10 nodes\\
+    Crossover probability & 100\%\\
+    Mutation probability & 25\%\\
+    Mutation operations & insert/remove/replace subtree,\newline change function/variable/coefficient\\
+    Maximum generations & 300\\
+    Maximum tree length & 20\\
+    Maximum tree depth & 10\\
+    Variable hyperparameters & Value \\
+    Local search iterations & $\{ 0, 1, 10, 50, 100\}$\\
+    Use transposition cache & $\{ \text{True, False} \}$\\
+    \end{tblr}
+    \caption{NSGA-2 Parameters}\label{tab:nsga2-settings}
+\end{table}
 
 \begin{table}
     \input{./fig/results_mdl.tex}
-    \caption{Test performance expressed as median test $R^2 \pm \sigma$}
+    \caption{Test performance given as median test $R^2 \pm \sigma$, without caching (above) and with caching (below). Statistically significant differences, computed using a directional Mann-Whitney U test ($\alpha=0.05$) are highlighted with green (better) and red (worse).}\label{tab:results-mdl}
 \end{table}
 
-% \begin{table}
-%     \input{./fig/best_length_mdl.tex}
-%     \caption{Average length of the best solution $\pm \sigma$}
-% \end{table}
+\begin{figure}
+    \includegraphics[width=\textwidth]{./fig/speedup.pdf}
+    \caption{Average speedup obtained with caching at the end of run (left) and generational (right)}\label{fig:average-speedup}
+\end{figure}
 
-% \newpage % remove me
+\begin{figure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{./fig/avg_fit.pdf}
+        \caption{Average fitness}\label{fig:avg-fitness}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{./fig/avg_length.pdf}
+        \caption{Average length}\label{fig:avg-length}
+    \end{subfigure}
+    \caption{Average fitness and average length, with/without caching}\label{fig:avg-fitness-length}
+\end{figure}
+
+\begin{figure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{./fig/cached_evals.pdf}
+        \caption{Cached evaluations per generation}\label{fig:cached-evals}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{./fig/total_evals.pdf}
+        \caption{Total evaluations per generation}\label{fig:total-evals}
+    \end{subfigure}
+    \caption{Cached and total evaluations per generation}\label{fig:evals}
+\end{figure}
+
+\paragraph{Results overview}
+
+Experimental results demonstrate the runtime benefits of caching (illustrated in~\autoref{fig:average-speedup}) with observed speedups of up to 34\%. At the same time, the median test $R^2$ values (illustrated in~\autoref{tab:results-mdl}) show that caching does not have a detrimental effect on fitness, but rather tends to produce slightly better results. A Mann-Whitney U statistical test performed using the 100 $R^2$ test values obtained for each configuration confirms that, in a majority of cases, no statistically significant difference in the $R^2$ test values could be detected. The SR variant with caching achieves statistically significant better results (albeit with negligible differences in absolute terms) in 19 out of 45 test configurations (highlighted with green in~\autoref{tab:results-mdl}), and statistically-worse results in 5 out of 45 test configurations (highlighted with red). It is worth mentioning that most statistically-worse results occur with an insufficient amount of local search (0 or 1 iterations).
+%
+However, despite similar results, a more detailed analysis of the microevolutionary dynamics at play reveals a notable difference in search behavior with fitness caching. The full set of results is available online: \url{https://github.com/foolnotion/symreg-london-2025}.
+
+
+\paragraph{Evolutionary dynamics}
+
+Although the final models are just as good, SR with caching displays slightly higher best model size (overall average 20.46 nodes compared to 20.18 without caching). However, these results are significant only in 8 out of 45 configurations (3 lower, 5 higher best model length with caching).
+%
+At the same time, \autoref{fig:avg-fitness-length} clearly shows lower average fitness as well as higher average expression size with caching. A possible explanation for these differences is given by the fact that caching leads to a more uniform fitness landscape which in turn diminishes the effects of selection pressure. Since the NSGA2 algorithm selects for high fitness and low length, the results are lower average fitness and higher average length.
+
+The effects of local search are significant even with a single iteration of gradient, further supporting the hypothesis of the Baldwin effect in GP.
+
+\paragraph{Effects of caching}
+
+We first measure ``cache hits'' (i.e. the number of times an individual's fitness is retrieved from the cache instead of being computed anew) and relate this quantity with the algorithm's population size of 1000 individuals. This indirectly represents a measure of population diversity, since a high cache hit rate implies duplicate individuals. The results shown in~\autoref{fig:cached-evals} show that major diversity loss occurs in the first few generations of the search, followed by a more gradual increase of duplicate individuals. As the amount of duplicate individuals increases, more evaluation effort is saved due to caching, as illustrated in~\autoref{fig:total-evals}. We note that even with a population size of 1000 individuals, a much higher amount of evaluations is possible due to local search. Here, the total includes the computation of residuals and gradients for local search. Even though a large amount of re-evaluations is avoided due to caching, the observed speedup is markedly lower due to other algorithmic steps other than evaluation taking some part of the total runtime, as differences in search dynamics (for example, a higher average length with caching) and overheads of the caching mechanism.
+
+\section{Conclusion and Future Work}\label{sec:conclusion}
+
+In this work we have shown that significant speedups of the evolutionary search in SR can be achieved via fitness caching. These improvements are made possible through the application of the Zobrist hash, a concept well-known in search algorithms for abstract board games. By indexing node positions and symbol types, the same concept is applicable for creating unique keys for the symbolic expressions that are encountered during the evolutionary search. However, its inability to detect semantic duplicates is an important limitation of this approach, that could be overcome in the future by introducing simplification heuristics for expressions, based on known identities and mathematical equivalences.
+
+Our implementation based on the Operon framework utilizes a highly-optimized concurrent hash map library and is able to achieve up to 34\% speedups (expected to increase with larger datasets) while maintaining solution quality. The high retrieval rate of fitness values from cache also suggests that diversity is rapidly lost in the initial phase of the evolutionary search. We also observe that fitness caching changes search behavior by altering the distribution of fitness values in the population, with notable effects in terms of average fitness and model length. This phenomenon is worth investigating further, as it could also lead to new mechanisms for directing the search and improving overall convergence.
+
+Future research efforts will be focused in finding new applications for the Zobrist hash in other areas of the evolutionary algorithm, notably selection and recombination, such as: dynamic control of selection pressure, selecting for uniqueness alongside fitness and/or complexity, preventing duplicates during recombination or extending the caching concept to sub-expressions.
+
 \bibliographystyle{RS}
 \bibliography{references}
 
