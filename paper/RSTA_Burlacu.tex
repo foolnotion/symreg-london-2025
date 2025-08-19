@@ -304,6 +304,13 @@ We perform 100 repetitions for each problem and set of hyperparameters, for a to
     \caption{Average speedup obtained with caching at the end of run (left) and generational (right)}\label{fig:average-speedup}
 \end{figure}
 
+\begin{table}
+    \centering
+    \input{fig/speedup-dimesions.tex}
+    \caption{Average speedup per problem}
+    \label{tab:average-speedup-problem}
+\end{table}
+
 \begin{figure}
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=\textwidth]{./fig/avg_fit.pdf}
@@ -313,7 +320,7 @@ We perform 100 repetitions for each problem and set of hyperparameters, for a to
         \includegraphics[width=\textwidth]{./fig/avg_length.pdf}
         \caption{Average length}\label{fig:avg-length}
     \end{subfigure}
-    \caption{Average fitness and average length, with/without caching}\label{fig:avg-fitness-length}
+    \caption{Average fitness and length, with/without caching. The shaded regions represent the 95\% confidence intervals.}\label{fig:avg-fitness-length}
 \end{figure}
 
 \begin{figure}
@@ -325,27 +332,34 @@ We perform 100 repetitions for each problem and set of hyperparameters, for a to
         \includegraphics[width=\textwidth]{./fig/total_evals.pdf}
         \caption{Total evaluations per generation}\label{fig:total-evals}
     \end{subfigure}
-    \caption{Cached and total evaluations per generation}\label{fig:evals}
+    \caption{Cached and total evaluations per generation. The shaded regions represent the 95\% confidence intervals.}\label{fig:evals}
 \end{figure}
 
 \paragraph{Results overview}
 
-Experimental results demonstrate the runtime benefits of caching (illustrated in~\autoref{fig:average-speedup}) with observed speedups of up to 34\%. At the same time, the median test $R^2$ values (illustrated in~\autoref{tab:results-mdl}) show that caching does not have a detrimental effect on fitness, but rather tends to produce slightly better results. A Mann-Whitney U statistical test performed using the 100 $R^2$ test values obtained for each configuration confirms that, in a majority of cases, no statistically significant difference in the $R^2$ test values could be detected. The SR variant with caching achieves statistically significant better results (albeit with negligible differences in absolute terms) in 19 out of 45 test configurations (highlighted with green in~\autoref{tab:results-mdl}), and statistically-worse results in 5 out of 45 test configurations (highlighted with red). It is worth mentioning that most statistically-worse results occur with an insufficient amount of local search (0 or 1 iterations).
+Experimental results demonstrate the runtime benefits of caching (illustrated in~\autoref{fig:average-speedup}) with observed speedups of up to 34\%. Looking at problem dimensions, we observe a positive correlation ($r=0.42$) between speedup and number of training rows and a negative correlation ($r=-0.44$) between speedup and number of features. Speedup values per problem and number of iterations are illustrated in~\autoref{tab:average-speedup-problem}. The largest measured speedup is 70\% for the Flow Stress problem with $100$ iterations.
+
+At the same time, the median test $R^2$ values (illustrated in~\autoref{tab:results-mdl}) show that caching does not have a detrimental effect on fitness, but rather tends to produce slightly better results. A Mann-Whitney U statistical test performed using the 100 $R^2$ test values obtained for each configuration confirms that, in a majority of cases, no statistically significant difference in the $R^2$ test values could be detected. The SR variant with caching achieves statistically significant better results (albeit with negligible differences in absolute terms) in 19 out of 45 test configurations (highlighted with green in~\autoref{tab:results-mdl}), and statistically-worse results in 5 out of 45 test configurations (highlighted with red). It is worth mentioning that most statistically-worse results occur with an insufficient amount of local search (0 or 1 iterations). A local search amount of 10 iterations per model appears to be optimal in terms of both runtime and model quality. This can be explained by the fact that due to the selection mechanism, the effects of local search in an evolutionary algorithm is cumulative, as good coefficient values are preserved.
 %
 However, despite similar results, a more detailed analysis of the microevolutionary dynamics at play reveals a notable difference in search behavior with fitness caching. The full set of results is available online: \url{https://github.com/foolnotion/symreg-london-2025}.
 
+\begin{table}
+    \centering
+    \input{fig/evaluations.tex}
+    \caption{Impact of local search on total model evaluations computed at the end of the run. Saved effort is computed relative to the not cached quantity.}\label{tab:local-search-impact}
+\end{table}
 
 \paragraph{Evolutionary dynamics}
 
 Although the final models are just as good, SR with caching displays slightly higher best model size (overall average 20.46 nodes compared to 20.18 without caching). However, these results are significant only in 8 out of 45 configurations (3 lower, 5 higher best model length with caching).
 %
 At the same time, \autoref{fig:avg-fitness-length} clearly shows lower average fitness as well as higher average expression size with caching. A possible explanation for these differences is given by the fact that caching leads to a more uniform fitness landscape which in turn diminishes the effects of selection pressure. Since the NSGA2 algorithm selects for high fitness and low length, the results are lower average fitness and higher average length.
-
+%
 The effects of local search are significant even with a single iteration of gradient, further supporting the hypothesis of the Baldwin effect in GP.
 
 \paragraph{Effects of caching}
 
-We first measure ``cache hits'' (i.e. the number of times an individual's fitness is retrieved from the cache instead of being computed anew) and relate this quantity with the algorithm's population size of 1000 individuals. This indirectly represents a measure of population diversity, since a high cache hit rate implies duplicate individuals. The results shown in~\autoref{fig:cached-evals} show that major diversity loss occurs in the first few generations of the search, followed by a more gradual increase of duplicate individuals. As the amount of duplicate individuals increases, more evaluation effort is saved due to caching, as illustrated in~\autoref{fig:total-evals}. We note that even with a population size of 1000 individuals, a much higher amount of evaluations is possible due to local search. Here, the total includes the computation of residuals and gradients for local search. Even though a large amount of re-evaluations is avoided due to caching, the observed speedup is markedly lower due to other algorithmic steps other than evaluation taking some part of the total runtime, as differences in search dynamics (for example, a higher average length with caching) and overheads of the caching mechanism.
+We first measure ``cache hits'' (i.e. the number of times an individual's fitness is retrieved from the cache instead of being computed anew) and relate this quantity with the algorithm's population size of 1000 individuals. This indirectly represents a measure of population diversity, since a high cache hit rate implies duplicate individuals. The results shown in~\autoref{fig:cached-evals} show that major diversity loss occurs in the first few generations of the search, followed by a more gradual increase of duplicate individuals. As the amount of duplicate individuals increases, more evaluation effort is saved due to caching, as illustrated in~\autoref{fig:total-evals}. We note that even with a population size of 1000 individuals, a much higher amount of evaluations is possible due to local search. Here, the total includes the computation of residuals and gradients for local search. Even though a large amount of re-evaluations is avoided due to caching, the observed speedup is markedly lower due to other algorithmic steps other than evaluation taking some part of the total runtime, as differences in search dynamics (for example, a higher average length with caching) and overheads of the caching mechanism. The impact of local search on the number of model evaluations (including automatic differentiation and the computation of residuals and Jacobians) is shown in~\autoref{tab:local-search-impact}. We note that the Levenberg-Marquardt algorithm may stop after fewer iterations in case of convergence, which explains the small differences in evaluation effort between 50 and 100 local search iterations. This further supports the idea that a lower amount of local search is sufficient in an evolutionary algorithm.
 
 \section{Conclusion and Future Work}\label{sec:conclusion}
 
@@ -357,5 +371,4 @@ Future research efforts will be focused in finding new applications for the Zobr
 
 \bibliographystyle{RS}
 \bibliography{references}
-
 \end{document}

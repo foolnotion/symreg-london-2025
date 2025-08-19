@@ -1,0 +1,195 @@
+\begin{thebibliography}{99}
+
+\bibitem{rudin2022}
+Rudin C, Chen C, Chen Z, Huang H, Semenova L, Zhong C. 2022  {Interpretable machine learning: Fundamental principles and 10 grand challenges}. {\em Statistics Surveys} \textbf{16}, 1 – 85.
+(\href{http://dx.doi.org/10.1214/21-SS133}{10.1214/21-SS133})
+
+\bibitem{matchev2022}
+Matchev KT, Matcheva K, Roman A. 2022  {Analytical Modeling of Exoplanet Transit Spectroscopy with Dimensional Analysis and Symbolic Regression}. {\em The Astrophysical Journal} \textbf{930}, 33.
+(\href{http://dx.doi.org/10.3847/1538-4357/ac610c}{10.3847/1538-4357/ac610c})
+
+\bibitem{bartlett2024}
+{Bartlett, Deaglan J.}, {Kammerer, Lukas}, {Kronberger, Gabriel}, {Desmond, Harry}, {Ferreira, Pedro G.}, {Wandelt, Benjamin D.}, {Burlacu, Bogdan}, {Alonso, David}, {Zennaro, Matteo}. 2024  {A precise symbolic emulator of the linear matter power spectrum}. {\em A\&A} \textbf{686}, A209.
+(\href{http://dx.doi.org/10.1051/0004-6361/202348811}{10.1051/0004-6361/202348811})
+
+\bibitem{desmond2023}
+Desmond H, Bartlett DJ, Ferreira PG. 2023  {On the functional form of the radial acceleration relation}. {\em Monthly Notices of the Royal Astronomical Society} \textbf{521}, 1817–1831.
+(\href{http://dx.doi.org/10.1093/mnras/stad597}{10.1093/mnras/stad597})
+
+\bibitem{lemos2023}
+Lemos P, Jeffrey N, Cranmer M, Ho S, Battaglia P. 2023  {Rediscovering orbital mechanics with machine learning}. {\em Machine Learning: Science and Technology} \textbf{4}, 045002.
+(\href{http://dx.doi.org/10.1088/2632-2153/acfa63}{10.1088/2632-2153/acfa63})
+
+\bibitem{grayeli2024}
+Grayeli A, Sehgal A, Costilla-Reyes O, Cranmer M, Chaudhuri S. 2024  {Symbolic Regression with a Learned Concept Library}. {\em ArXiv} \textbf{abs/2409.09359}.
+
+\bibitem{wang2019}
+Wang Y, Wagner N, Rondinelli JM. 2019  {Symbolic regression in materials science}. {\em MRS communications} \textbf{9}, 793–805.
+(\href{http://dx.doi.org/10.1557/mrc.2019.85}{10.1557/mrc.2019.85})
+
+\bibitem{wang2022}
+Wang C, Zhang Y, Wen C, Yang M, Lookman T, Su Y, Zhang TY. 2022  {Symbolic regression in materials science via dimension-synchronous-computation}. {\em Journal of Materials Science \& Technology} \textbf{122}, 77–83.
+(\href{http://dx.doi.org/10.1016/j.jmst.2021.12.052}{10.1016/j.jmst.2021.12.052})
+
+\bibitem{wang2024}
+Wang G, Wang E, Li Z, Zhou J, Sun Z. 2024  {Exploring the mathematic equations behind the materials science data using interpretable symbolic regression}. {\em Interdisciplinary Materials} \textbf{3}, 637–657.
+(\href{http://dx.doi.org/10.1002/idm2.12180}{10.1002/idm2.12180})
+
+\bibitem{dong2023}
+Dong Z, Kong K, Matchev KT, Matcheva K. 2023  {Is the machine smarter than the theorist: Deriving formulas for particle kinematics with symbolic regression}. {\em Phys. Rev. D} \textbf{107}, 055018.
+(\href{http://dx.doi.org/10.1103/PhysRevD.107.055018}{10.1103/PhysRevD.107.055018})
+
+\bibitem{morales-alvarado2024}
+Morales-Alvarado M, Conde D, Bendavid J, Sanz V, Ubiali M. 2024  {Symbolic regression for precision LHC physics}. In {\em {38th conference on Neural Information Processing Systems}}.
+
+\bibitem{zhang2023}
+Zhang Z, Chen Z. 2023  {Modeling and Control of Robotic Manipulators Based on Symbolic Regression}. {\em IEEE Transactions on Neural Networks and Learning Systems} \textbf{34}, 2440–2450.
+(\href{http://dx.doi.org/10.1109/TNNLS.2021.3106648}{10.1109/TNNLS.2021.3106648})
+
+\bibitem{danai2021}
+Danai K, {La Cava} WG. 2021  {Controller design by symbolic regression}. {\em Mechanical Systems and Signal Processing} \textbf{151}, 107348.
+(\href{http://dx.doi.org/10.1016/j.ymssp.2020.107348}{10.1016/j.ymssp.2020.107348})
+
+\bibitem{lacava2023}
+{La Cava} WG, Lee PC, Ajmal I, Ding X, Solanki P, Cohen JB, Moore JH, Herman DS. 2023  {A flexible symbolic regression method for constructing interpretable clinical prediction models}. {\em npj Digital Medicine} \textbf{6}, Article number: 107.
+Silver 2023 HUMIES (\href{http://dx.doi.org/10.1038/s41746-023-00833-8}{10.1038/s41746-023-00833-8})
+
+\bibitem{petersen2021}
+Petersen BK, Landajuela M, Mundhenk TN, Santiago CP, Kim S, Kim JT. 2021  {Deep symbolic regression: Recovering mathematical expressions from data via risk-seeking policy gradients}. In {\em {9th International Conference on Learning Representations, {ICLR} 2021, Virtual Event, Austria, May 3-7, 2021}}. OpenReview.net.
+
+\bibitem{kamienny2022}
+Kamienny PA, d'Ascoli S, Lample G, Charton F. 2022  {End-to-end symbolic regression with transformers}. {\em Advances in Neural Information Processing Systems} \textbf{35}, 10269–10281.
+
+\bibitem{landajuela2022}
+Landajuela M, Lee CS, Yang J, Glatt R, Santiago CP, Aravena I, Mundhenk TN, Mulcahy G, Petersen BK. 2022  {A Unified Framework for Deep Symbolic Regression}. In Koyejo S, Mohamed S, Agarwal A, Belgrave D, Cho K, Oh A, editors, {\em {Advances in Neural Information Processing Systems 35: Annual Conference on Neural Information Processing Systems, NeurIPS 2022}} p. 33985–33998 New Orleans, USA. Curran Associates, Inc.
+
+\bibitem{vastl2024}
+Vastl M, Kulhánek J, Kubalík J, Derner E, Babuška R. 2024  {SymFormer: End-to-End Symbolic Regression Using Transformer-Based Architecture}. {\em IEEE Access} \textbf{12}, 37840–37849.
+(\href{http://dx.doi.org/10.1109/ACCESS.2024.3374649}{10.1109/ACCESS.2024.3374649})
+
+\bibitem{sahoo2018}
+Sahoo S, Lampert C, Martius G. 2018  {Learning equations for extrapolation and control}. In {\em {International Conference on Machine Learning}} p. 4442–4450. Pmlr.
+
+\bibitem{worm2013}
+Worm T, Chiu K. 2013  {Prioritized grammar enumeration: symbolic regression by dynamic programming}. In Blum C, Alba E, Auger A, Bacardit J, Bongard J, Branke J, Bredeche N, Brockhoff D, Chicano F, Dorin A, Doursat R, Ekart A, Friedrich T, Giacobini M, Harman M, Iba H, Igel C, Jansen T, Kovacs T, Kowaliw T, Lopez-Ibanez M, Lozano JA, Luque G, McCall J, Moraglio A, Motsinger-Reif A, Neumann F, Ochoa G, Olague G, Ong YS, Palmer ME, Pappa GL, Parsopoulos KE, Schmickl T, Smith SL, Solnon C, Stuetzle T, Talbi EG, Tauritz D, Vanneschi L, editors, {\em {GECCO '13: Proceeding of the fifteenth annual conference on Genetic and evolutionary computation conference}} p. 1021–1028 Amsterdam, The Netherlands. ACM.
+Best paper (\href{http://dx.doi.org/10.1145/2463372.2463486}{10.1145/2463372.2463486})
+
+\bibitem{cozad2018}
+Cozad A, Sahinidis NV. 2018  {A global {MINLP} approach to symbolic regression}. {\em Mathematical Programming} \textbf{170}, 97–119.
+Special Issue: International Symposium on Mathematical Programming, Bordeaux, July 2018 (\href{http://dx.doi.org/10.1007/s10107-018-1289-x}{10.1007/s10107-018-1289-x})
+
+\bibitem{mcconaghy2011}
+McConaghy T. 2011 p. 235–260.
+In {\em {FFX: Fast, Scalable, Deterministic Symbolic Regression Technology}}, p. 235–260. New York, NY: Springer New York.
+(\href{http://dx.doi.org/10.1007/978-1-4614-1770-5\_13}{10.1007/978-1-4614-1770-5\_13})
+
+\bibitem{kammerer2020}
+Kammerer L, Kronberger G, Burlacu B, Winkler SM, Kommenda M, Affenzeller M. 2020 p. 79–99.
+In {\em {Symbolic Regression by Exhaustive Search: Reducing the Search Space Using Syntactical Constraints and Efficient Semantic Structure Deduplication}}, p. 79–99. Springer International Publishing.
+(\href{http://dx.doi.org/10.1007/978-3-030-39958-0\_5}{10.1007/978-3-030-39958-0\_5})
+
+\bibitem{koza1992}
+Koza JR. 1992 {\em {Genetic Programming: On the Programming of Computers by Means of Natural Selection}}.
+Cambridge, MA, USA: MIT Press.
+
+\bibitem{lacava2021}
+{La Cava} W, Orzechowski P, Burlacu B, {de Franca} F, Virgolin M, Jin Y, Kommenda M, Moore J. 2021  {Contemporary Symbolic Regression Methods and their Relative Performance}. In Vanschoren J, Yeung SK, editors, {\em {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks}} vol.~1. Curran.
+
+\bibitem{defranca2024}
+de~Franca FO, Virgolin M, Kommenda M, Majumder MS, Cranmer M, Espada G, Ingelse L, Fonseca A, Landajuela M, Petersen B, Glatt R, Mundhenk N, Lee CS, Hochhalter JD, Randall DL, Kamienny P, Zhang H, Dick G, Simon A, Burlacu B, Kasak J, Machado M, Wilstrup C, Cavaz WGL. 2024  {SRBench++: Principled Benchmarking of Symbolic Regression With Domain-Expert Interpretation}. {\em IEEE Transactions on Evolutionary Computation} p. 1–1.
+(\href{http://dx.doi.org/10.1109/TEVC.2024.3423681}{10.1109/TEVC.2024.3423681})
+
+\bibitem{kronberger2024}
+Kronberger G, {Olivetti de Franca} F, Desmond H, Bartlett DJ, Kammerer L. 2024  {The Inefficiency of Genetic Programming for Symbolic Regression}. In Affenzeller M, Winkler SM, Kononova AV, Trautmann H, Tušar T, Machado P, Bäck T, editors, {\em {Parallel Problem Solving from Nature – PPSN XVIII}} p. 273–289 Cham. Springer Nature Switzerland.
+
+\bibitem{burks2015}
+Burks AR, Punch WF. 2015  {An Efficient Structural Diversity Technique for Genetic Programming}. In {\em {Proceedings of the 2015 Annual Conference on Genetic and Evolutionary Computation}} {GECCO '15} p. 991–998 New York, NY, USA. Association for Computing Machinery.
+(\href{http://dx.doi.org/10.1145/2739480.2754649}{10.1145/2739480.2754649})
+
+\bibitem{chen2021}
+Chen Q, Xue B, Zhang M. 2021  {Preserving Population Diversity Based on Transformed Semantics in Genetic Programming for Symbolic Regression}. {\em Trans. Evol. Comp} \textbf{25}, 433–447.
+(\href{http://dx.doi.org/10.1109/TEVC.2020.3046569}{10.1109/TEVC.2020.3046569})
+
+\bibitem{kommenda2020}
+Kommenda M, Burlacu B, Kronberger G, Affenzeller M. 2020  {Parameter identification for symbolic regression using nonlinear least squares}. {\em Genetic Programming and Evolvable Machines} \textbf{21}, 471–501.
+Special Issue on Integrating numerical optimization methods with genetic programming (\href{http://dx.doi.org/10.1007/s10710-019-09371-3}{10.1007/s10710-019-09371-3})
+
+\bibitem{burlacu2024}
+Burlacu B, Winkler SM, Affenzeller M. 2024  {Revisiting Gradient-Based Local Search in Symbolic Regression}. In Winkler SM, Banzhaf W, Hu T, Lalejini A, editors, {\em {Genetic Programming Theory and Practice XXI}} {Genetic and Evolutionary Computation} p. 259–273 University of Michigan, USA. Springer.
+(\href{http://dx.doi.org/10.1007/978-981-96-0077-9\_13}{10.1007/978-981-96-0077-9\_13})
+
+\bibitem{crepinsek2013}
+Črepinšek M, Liu SH, Mernik M. 2013  {Exploration and exploitation in evolutionary algorithms: A survey}. {\em ACM Comput. Surv.} \textbf{45}.
+(\href{http://dx.doi.org/10.1145/2480741.2480752}{10.1145/2480741.2480752})
+
+\bibitem{prugel-bennett2000}
+Prügel-Bennett A. 2000  {Finite population effects for ranking and tournament selection}. {\em Complex Systems} \textbf{12}, 183–205.
+
+\bibitem{xie2011}
+Xie H, Zhang M. 2011  {Impacts of sampling strategies in tournament selection for genetic programming}. {\em Soft Computing} \textbf{16}, 615–633.
+
+\bibitem{handley1994}
+Handley S. 1994  {On the use of a directed acyclic graph to represent a population of computer programs}. In {\em {Proceedings of the First IEEE Conference on Evolutionary Computation. IEEE World Congress on Computational Intelligence}} p. 154–159 vol.1.
+(\href{http://dx.doi.org/10.1109/ICEC.1994.350024}{10.1109/ICEC.1994.350024})
+
+\bibitem{keijzer2004}
+Keijzer M. 2004  {Alternatives in Subtree Caching for Genetic Programming}. In Keijzer M, O'Reilly UM, Lucas SM, Costa E, Soule T, editors, {\em {Genetic Programming 7th European Conference, EuroGP 2004, Proceedings}} vol. 3003{\em {LNCS}} p. 328–337 Coimbra, Portugal. Springer-Verlag.
+(\href{http://dx.doi.org/10.1007/978-3-540-24650-3\_31}{10.1007/978-3-540-24650-3\_31})
+
+\bibitem{defranca2025}
+de~Franca FO, Kronberger G. 2025  {Improving Genetic Programming for Symbolic Regression with Equality Graphs}. In {\em {Proceedings of the Genetic and Evolutionary Computation Conference}} {GECCO '25} New York, NY, USA. Association for Computing Machinery.
+(\href{http://dx.doi.org/10.1145/3712256.3726383}{10.1145/3712256.3726383})
+
+\bibitem{wong2008}
+Wong P, Zhang M. 2008  {SCHEME: Caching subtrees in genetic programming}. In {\em {2008 IEEE Congress on Evolutionary Computation (IEEE World Congress on Computational Intelligence)}} p. 2678–2685.
+(\href{http://dx.doi.org/10.1109/CEC.2008.4631158}{10.1109/CEC.2008.4631158})
+
+\bibitem{zhang1992}
+Zhang K, Statman R, Shasha D. 1992  {On the editing distance between unordered labeled trees}. {\em Information Processing Letters} \textbf{42}, 133–139.
+(\href{http://dx.doi.org/10.1016/0020-0190(92)90136-J}{10.1016/0020-0190(92)90136-J})
+
+\bibitem{burlacu2019}
+Burlacu B, Affenzeller M, Kronberger G, Kommenda M. 2019  {Online Diversity Control in Symbolic Regression via a Fast Hash-based Tree Similarity Measure}. In {\em {2019 IEEE Congress on Evolutionary Computation (CEC)}} p. 2175–2182.
+(\href{http://dx.doi.org/10.1109/CEC.2019.8790162}{10.1109/CEC.2019.8790162})
+
+\bibitem{burlacu2020}
+Burlacu B, Kronberger G, Kommenda M. 2020  {Operon C++: an efficient genetic programming framework for symbolic regression}. In {\em {Proceedings of the 2020 Genetic and Evolutionary Computation Conference Companion}} {GECCO '20} p. 1562–1570 New York, NY, USA. Association for Computing Machinery.
+(\href{http://dx.doi.org/10.1145/3377929.3398099}{10.1145/3377929.3398099})
+
+\bibitem{popovitch2019}
+Popovitch G. 2019  {The Parallel Hashmap}. .
+
+\bibitem{blackman2021}
+Blackman D, Vigna S. 2021  {Scrambled Linear Pseudorandom Number Generators}. {\em ACM Trans. Math. Softw.} \textbf{47}.
+(\href{http://dx.doi.org/10.1145/3460772}{10.1145/3460772})
+
+\bibitem{deb2002}
+{Deb} K, {Pratap} A, {Agarwal} S, {Meyarivan} T. 2002  {A fast and elitist multiobjective genetic algorithm: {NSGA-II}}. {\em IEEE Transactions on Evolutionary Computation} \textbf{6}, 182–197.
+(\href{http://dx.doi.org/10.1109/4235.996017}{10.1109/4235.996017})
+
+\bibitem{grunwald2019}
+Grünwald P, Roos T. 2019  {Minimum description length revisited}. {\em International Journal of Mathematics for Industry} \textbf{11}.
+(\href{http://dx.doi.org/10.1142/s2661335219300018}{10.1142/s2661335219300018})
+
+\bibitem{gavin2019}
+Gavin HP. 2019  {The Levenberg-Marquardt algorithm for nonlinear least squares curve-fitting problems}. {\em Department of Civil and Environmental Engineering Duke University August} \textbf{3}, 1–23.
+
+\bibitem{kordon2008}
+Kordon A. 2008  {Evolutionary Computation in the Chemical Industry}. In Yu T, Davis D, Baydar C, Roy R, editors, {\em {Evolutionary Computation in Practice}}, {Studies in Computational Intelligence},  vol.~88,  p. 245–262. Springer.
+(\href{http://dx.doi.org/10.1007/978-3-540-75771-9\_11}{10.1007/978-3-540-75771-9\_11})
+
+\bibitem{kabliman2021}
+Kabliman E, Kolody AH, Kronsteiner J, Kommenda M, Kronberger G. 2021  {Application of symbolic regression for constitutive modeling of plastic deformation}. {\em Applications in Engineering Science} \textbf{6}, 100052.
+(\href{http://dx.doi.org/10.1016/j.apples.2021.100052}{10.1016/j.apples.2021.100052})
+
+\bibitem{kronberger2018}
+Kronberger G, Kommenda M, Promberger A, Nickel F. 2018  {Predicting friction system performance with symbolic regression and genetic programming with factor variables}. In {\em {Proceedings of the Genetic and Evolutionary Computation Conference}} {GECCO '18} p. 1278–1285 New York, NY, USA. Association for Computing Machinery.
+(\href{http://dx.doi.org/10.1145/3205455.3205522}{10.1145/3205455.3205522})
+
+\bibitem{saha2007}
+Saha B, Goebel K. 2007  {Battery data set}. {\em NASA AMES prognostics data repository}.
+
+\bibitem{nikuradse1950}
+Nikuradse J et~al.. 1950  {Laws of flow in rough pipes}. .
+
+\end{thebibliography}

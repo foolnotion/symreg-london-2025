@@ -1,0 +1,44 @@
+Referee: 1
+
+Comments to Author(s)
+This paper introduces a caching mechanism based on Zobrist hashing to memorize expressions. The central idea is to map previously visited expressions to their performance metrics (i.e. fitness), avoiding unnecessary computational effort. The authors begin by introducing GP and SR, contextualizing the field and the problem investigated. The focus then shifts to the proposed method, whose efficiency is demonstrated through experimental evaluation using a well-established framework for SR called Operon.
+
+Overall, the paper is well written, and the reading experience is fluid. I believe the paper is almost ready for publication, however I do believe the paper can be improved regarding how the results are reported, and with small changes on the text writing. A minor revision would fix these problems with no additional experiments.
+
+Regarding the results section, I believe it could provide more detailed results related to dimensionality of the problems. On page 12, line 27, you mention plans for future work involving higher-dimensional datasets. However, I believe that the current benchmark suite already includes problems with varying dimensionality that could be better explored for this particular purpose. I suggest adding an additional figure that explores the results using dataset size (e.g., number of rows, columns, or data points) as a variable and discussing it. This would strengthen the paper and help alleviate the tasks mentioned as future work.
+
+The paper could benefit from a clearer emphasis on why computational effort is wasted in the absence of memoization. This helps framing your contribution and could help contextualize the motivation behind the proposed method.
+
+Minor comments:
+
+In the introduction, you state that SVMs are black-box models. However, some authors argue that SVMs with linear kernels and few variables can be interpretable, and even support native feature importance. I recommend rephrasing this sentence, perhaps by mentioning non-linear kernel SVMs specifically, or by using a different model as an example of a black-box approach.
+
+In the first paragraph, it would be helpful to reorder the list of application domains by relevance to the issue’s readers, prioritizing physics-related applications, and group them by similarity.
+
+Section 2 is excellent; it provides a very clear and well-structured review of SR and GP.
+
+On page 7, line 45, and in some of the following paragraphs, the figures referenced are located too far from the corresponding text. This forces the reader to go back and forth between pages. I suggest making substantial layout adjustments to place figures closer to where they are mentioned, and perhaps reordering them so that Figure 6 is not discussed before Figure 5.
+
+The paper would also benefit from improved explanations of certain methods, as readers unfamiliar with GP terminology might find them unclear. For example, terms like NSGA (page 8, line 49) and MDL (page 8, line 52) are introduced without definition. NSGA is particularly important since it is used in the discussion later (page 11, line 48). Additionally, on page 9, line 47, you should cite the LM algorithm and consider including a brief paragraph describing how it works.
+
+If space is a concern, you could convert Table 2 into a paragraph.
+
+Regarding Figure 7, I believe the results also support your argument that the number of local iterations can be kept small. Do you think this is a valid interpretation? It appears that increasing local iterations beyond 10 does not significantly improve performance. A discussion of this behavior would strengthen your claims. Furthermore, the plot on the left could benefit from a different scale to emphasize the differences, as well as varied line styles to improve visual clarity.
+
+In Figure 8a, I noticed that the “True” line has a very narrow shaded region. Is that a confidence interval? If so, please clarify this in the figure caption. Also, why are confidence intervals only shown in Figures 8a and 9b? Clarifying this point would improve consistency.
+
+Finally, a minor correction: in Figure 2, the subscripted indices of x_1​ and x_2​ are missing in the second tree.
+
+
+
+Referee: 2
+
+Comments to Author(s)
+The manuscript proposes a new caching mechanism, based on the Zobrist hash, to improve the runtime performance of Symbolic Regression (via Genetic Programming) by storing the duplicate expressions during the evolution.
+The experimental results demonstrate a general runtime speedup up to 34% with no negative impact on search quality.
+
+The paper is clear and well written, and the contribution is very original. I recommend publication after some minor revisions.
+
+1. Figures 7–9 present averaged results. Are these results averaged also with respect to the datasets? It would be interesting to see these plots for two datasets with two different number of features, like Chemical-II (57 features) vs Nikuradse-I (2 features).
+Because all these datasets seems very different in terms of size and number of features. In other words, could the author comment on how the results vary across different datasets?
+2. There is a small typo in the abstract: it is written that you observe up to 25% speedups. However, in line 55 of page 8 and in Figure 7 it is shown a speedup of up to 34%.
