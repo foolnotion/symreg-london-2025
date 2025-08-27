@@ -53,7 +53,7 @@ Heuristic and Evolutionary Algorithms Laboratory\\
 Softwarepark 11, 4232, Hagenberg, Austria}
 
 %%%% Subject entries to be placed here %%%%
-\subject{xxxxx, xxxxx, xxxx}
+\subject{machine learning, symbolic regression}
 
 %%%% Keyword entries to be placed here %%%%
 \keywords{symbolic regression, genetic programming, Zobrist hash, tree hashing, diversity, fitness caching}
@@ -138,7 +138,7 @@ Diversity has an impact on search convergence, as the outcome of recombination w
     \caption{Percentage of not selected individuals as a function of tournament size}\label{fig:tournament-selection-pressure}
 \end{figure}
 
-From a practical perspective, given the unavoidable loss of diversity over the course of evolution, it is reasonable to assume that some solutions produced by recombination will not be unique, and their initial evaluations could be reused, with significant runtime benefits. Furthermore, detecting when duplicates \textit{may} occur or detecting the \textit{frequency} of duplicate individuals in the population may also lead to better strategies for diversity maintenance.
+From a practical perspective, given the unavoidable loss of diversity over the course of evolution, it is reasonable to assume that some solutions produced by recombination will not be unique, and their initial evaluations could be reused, with significant runtime benefits. Furthermore, detecting when duplicates \textit{may} occur or detecting the \textit{frequency} of duplicate individuals in the population may also lead to better strategies for diversity maintenance. For these reasons, a practical solution for \emph{memoization} in SR can bring significant benefits as it would be able to exploit the inherent duplication and waste of computational effort within GP.
 %
 
 Previous attempts to improve runtime efficiency focused on alternative representations, for example storing the population as a graph\cite{handley1994,keijzer2004,defranca2025} or subtree caching\cite{wong2008}. The caching approach is of particular interest here as it does not require changes to the fundamental structure of the algorithm. However, implementing an efficient cache requires an accurate, low-overhead hashing function, with certain desirable properties such as hash involution. This paper introduces a hashing approach based on Zobrist keys that allows the caching of expression trees with minimal overhead, whose inner workings are described in the following section.
